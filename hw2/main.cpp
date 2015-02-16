@@ -2,7 +2,7 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <SDL_image.h>
-#include "math.h"
+
 
 const float TOP = 1.0f;
 const float BOTTOM = -1.0f;
@@ -13,7 +13,7 @@ class Entity {
 public:
 
 
-	Entity(float &x, float &y, float &w, float &h, float &s, char *image_Path)
+	Entity(float x, float y, float w, float h, float s, char *image_Path)
 	{
 		SDL_Surface *surface = IMG_Load(image_Path);
 		GLuint textureID;
@@ -212,7 +212,7 @@ int main(int argc, char *argv[])
 	float elapsed = ticks - lastFrameTicks;
 
 	// initialize entities
-	Entity *first = new Entity(-1.3, 0.0, 0.1, 0.3, 1.0, "paddle.png");
+	Entity *first = new Entity(-1.3f, 0.0f, 0.1f, 0.3f, 1.0f, "paddle.png");
 	Entity *second = new Entity(1.3, 0.0, 0.1, 0.3, 1.0, "paddle.png");
 	Entity *ball = new Entity(0.0, 0.0, 0.1, 0.1, 6.0, "ball.png");
 
@@ -233,4 +233,5 @@ int main(int argc, char *argv[])
 	}
 
 	cleanUp();
+	return 0;
 }
