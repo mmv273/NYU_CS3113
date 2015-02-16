@@ -33,15 +33,24 @@ public:
 		texture = textureID;
 	}
 
-	float getX() { return posx; }
-	float getY() {return posy; }
-	float getSpeed() { return speed; }
-	float getDirectionX() { return direction_X; }
-	float getDirectionY() { return direction_Y; }
-	void setX(float newX) { posx = newX; }
-	void setY(float newY) { posy = newY; }
-	void setDirectionX(float newDirectionX) { direction_X = newDirectionX; }
-	void setDirectionY(float newDirectionY) { direction_Y = newDirectionY; }
+	float getX() { 
+		return posx; }
+	float getY() {
+		return posy; }
+	float getSpeed() { 
+		return speed; }
+	float getDirectionX() { 
+		return direction_X; }
+	float getDirectionY() { 
+		return direction_Y; }
+	void setX(float newX) { 
+		posx = newX; }
+	void setY(float newY) { 
+		posy = newY; }
+	void setDirectionX(float newDirectionX) { 
+		direction_X = newDirectionX; }
+	void setDirectionY(float newDirectionY) { 
+		direction_Y = newDirectionY; }
 
 	
 	void draw(){
@@ -105,20 +114,20 @@ bool ProcessEvents(SDL_Event &event, const Uint8 *keys, Entity *first, Entity *s
 	// our SDL event loop
 	// check input events
 	while (SDL_PollEvent(&event)) {
-		if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) { // end the game because they closed the window
+		if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
 			return false;
 		}
 	}
-	if (keys[SDL_SCANCODE_W] && first->getY() < 0.83) {
+	if (keys[SDL_SCANCODE_W] && first->getY() < 0.80) {
 		first->setY(first->getY() + elapsed);
 	}
-	else if (keys[SDL_SCANCODE_S] && first->getY() > -0.83) {
+	else if (keys[SDL_SCANCODE_S] && first->getY() > -0.8) {
 		first->setY(first->getY() - elapsed);
 	}
-	if (keys[SDL_SCANCODE_UP] && second->getY() < 0.83) {
+	if (keys[SDL_SCANCODE_UP] && second->getY() < 0.8) {
 		second->setY(second->getY() + elapsed);
 	}
-	else if (keys[SDL_SCANCODE_DOWN] && second->getY() > -0.83) {
+	else if (keys[SDL_SCANCODE_DOWN] && second->getY() > -0.8) {
 		second->setY(second->getY() - elapsed);
 	}
 	return true;
@@ -126,65 +135,69 @@ bool ProcessEvents(SDL_Event &event, const Uint8 *keys, Entity *first, Entity *s
 
 void update(Entity *first, Entity *second, Entity *ball, float &firstwon, float &elapsed) {
 
-	// update ball movement with time
+	// finds the balls speed and direction
 	ball->setX(ball->getX() + (elapsed * (ball->getDirectionX() * ball->getSpeed())));
 	ball->setY(ball->getY() + (elapsed * (ball->getDirectionY() * ball->getSpeed())));
 
-	if (ball->getY() > TOP) { // collision with ceiling
+	// checks if the ball hits the top of the window
+	if (ball->getY() > TOP) { 
+		ball->setDirectionY(-1.0 * ball->getDirectionY());
+	}//checks if the ball hits the bottom of the window
+	else if (ball->getY() < BOTTOM) {
 		ball->setDirectionY(-1.0 * ball->getDirectionY());
 	}
-	else if (ball->getY() < BOTTOM) { // collision with floor
-		ball->setDirectionY(-1.0 * ball->getDirectionY());
-	}
-
-	// ball hits player one's paddle
-	if (ball->getX() < -1.2 &&
-		ball->getY() > first->getY() - 0.2 &&
-		ball->getY() < first->getY() + 0.2)
-	{
+	// checks if the ball went through player two paddle thus giving the point to player one
+	if (ball->getX() > RIGHT) { 
+		firstwon = 0.0;
+		ball->setX(0.0);
+		ball->setY(0.0);
 		ball->setDirectionX(-1.0 * ball->getDirectionX());
 	}
-	// ball hits player two's paddle
-	else if (ball->getX() > 1.2 &&
-		ball->getY() > second->getY() - 0.2 &&
-		ball->getY() < second->getY() + 0.2)
-	{
-		ball->setDirectionX(-1.0 * ball->getDirectionX());
-	}
-
-	if (ball->getX() > RIGHT) { // player one scores
+	// checks if the ball went through player one paddle thus giving the point to player two
+	else if (ball->getX() < LEFT) { 
 		firstwon = 1.0;
 		ball->setX(0.0);
 		ball->setY(0.0);
 		ball->setDirectionX(-1.0 * ball->getDirectionX());
 	}
-	else if (ball->getX() < LEFT) { // player two scores
-		firstwon = 2.0;
-		ball->setX(0.0);
-		ball->setY(0.0);
-		ball->setDirectionX(-1.0 * ball->getDirectionX());
+
+	// checks if the ball collidied with player one paddleand slowly speeds up the ball to increase the diffuculity 
+	if (ball->getX() < -1.2 &&
+		ball->getY() > first->getY() - 0.2 &&
+		ball->getY() < first->getY() + 0.2)
+	{
+		ball->setDirectionX(-1.0 * ball->getDirectionX() + .005);
+	}
+	// checks if the ball collided with player two paddle and slowly speeds up the ball to increase diffuculity 
+	else if (ball->getX() > 1.2 &&
+		ball->getY() > second->getY() - 0.2 &&
+		ball->getY() < second->getY() + 0.2)
+	{
+		ball->setDirectionX(-1.0 * ball->getDirectionX() - .005);
 	}
 
+	
 }
 
 void render( Entity *first, Entity *second, Entity *ball, float &firstwon, float &elapsed) {
 
-	
+	// starts the screen with black 
 	glMatrixMode(GL_MODELVIEW);
 	glClearColor(0.0, 0.0, 0.0, 0.0); 
 	glClear(GL_COLOR_BUFFER_BIT);
 	first->draw();
 	second->draw();
 	ball->draw();
-
-	if (firstwon == 1.0) { 
-		ball->reloadtexture("yellowball.png");
+	// if player one wins the ball turns blue
+	if (firstwon == 0.0) { 
+		ball->reloadtexture("blueball.png");
 		first->draw();
 		second->draw();
 		ball->draw();
 	}
-	if (firstwon == 2.0) { 
-		ball->reloadtexture("blueball.png");
+	// if the player two wins the ball stays white
+	if (firstwon == 1.0) { 
+		ball->reloadtexture("ball.png");
 		first->draw();
 		second->draw();
 		ball->draw();
@@ -201,25 +214,16 @@ int main(int argc, char *argv[])
 {
 	SDL_Event event;
 	setup();
-
-	// initialize timing variables
 	float lastFrameTicks = 0.0;
 	float ticks = (float)SDL_GetTicks() / 1000.0;
 	float elapsed = ticks - lastFrameTicks;
-
-	// initialize entities
+	float firstwon;
+	const Uint8 *keys = SDL_GetKeyboardState(NULL);
 	Entity *first = new Entity(-1.3f, 0.0f, 0.1f, 0.3f, 1.0f, "paddle.png");
 	Entity *second = new Entity(1.3, 0.0, 0.1, 0.3, 1.0, "paddle.png");
 	Entity *ball = new Entity(0.0, 0.0, 0.1, 0.1, 6.0, "ball.png");
-
-	// initialize gameplay variables
-	float firstwon;
-	const Uint8 *keys = SDL_GetKeyboardState(NULL);
-
-	// nudge the ball to get it moving, initially
-	ball->setDirectionX(0.1);
-	ball->setDirectionY(-0.1);
-
+	ball->setDirectionX(0.09);
+	ball->setDirectionY(-0.09);
 	while (ProcessEvents(event, keys, first, second, elapsed)) {
 		ticks = (float)SDL_GetTicks() / 1000.0;
 		elapsed = ticks - lastFrameTicks;
@@ -227,7 +231,6 @@ int main(int argc, char *argv[])
 		update(first, second, ball, firstwon, elapsed);
 		render(first, second, ball, firstwon, elapsed);
 	}
-
 	cleanUp();
 	return 0;
 }
