@@ -51,7 +51,7 @@ public:
 		glLoadIdentity();
 		glTranslatef(posx, posy, 0.0);
 		glRotatef(0.0, 0.0, 0.0, 1.0);
-		GLfloat quad[] = { -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f };
+		GLfloat quad[] = { -0.5f * width, 0.5f * height, -0.5f * width, -0.5f * height, 0.5f *width, -0.5f * height, 0.5f * width, 0.5f * height };
 		glVertexPointer(2, GL_FLOAT, 0, quad);
 		glEnableClientState(GL_VERTEX_ARRAY);
 		GLfloat quadUVs[] = { 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0 };
@@ -124,7 +124,7 @@ bool ProcessEvents(SDL_Event &event, const Uint8 *keys, Entity *first, Entity *s
 	return true;
 }
 
-void update(Entity *first, Entity *second, Entity *ball, bool &firstwon, float &elapsed) {
+void update(Entity *first, Entity *second, Entity *ball, float &firstwon, float &elapsed) {
 
 	// update ball movement with time
 	ball->setX(ball->getX() + (elapsed * (ball->getDirectionX() * ball->getSpeed())));
@@ -153,13 +153,13 @@ void update(Entity *first, Entity *second, Entity *ball, bool &firstwon, float &
 	}
 
 	if (ball->getX() > RIGHT) { // player one scores
-		firstwon = true;
+		firstwon = 1.0;
 		ball->setX(0.0);
 		ball->setY(0.0);
 		ball->setDirectionX(-1.0 * ball->getDirectionX());
 	}
 	else if (ball->getX() < LEFT) { // player two scores
-		firstwon = false;
+		firstwon = 2.0;
 		ball->setX(0.0);
 		ball->setY(0.0);
 		ball->setDirectionX(-1.0 * ball->getDirectionX());
@@ -167,7 +167,7 @@ void update(Entity *first, Entity *second, Entity *ball, bool &firstwon, float &
 
 }
 
-void render(SDL_Window *&displayWindow, Entity *first, Entity *second, Entity *ball, bool &firstwon, float &elapsed) {
+void render( Entity *first, Entity *second, Entity *ball, float &firstwon, float &elapsed) {
 
 	
 	glMatrixMode(GL_MODELVIEW);
@@ -177,13 +177,13 @@ void render(SDL_Window *&displayWindow, Entity *first, Entity *second, Entity *b
 	second->draw();
 	ball->draw();
 
-	if (firstwon == true) { 
-		ball->reloadtexture("redball.png");
+	if (firstwon == 1.0) { 
+		ball->reloadtexture("yellowball.png");
 		first->draw();
 		second->draw();
 		ball->draw();
 	}
-	if (firstwon == false) { 
+	if (firstwon == 2.0) { 
 		ball->reloadtexture("blueball.png");
 		first->draw();
 		second->draw();
@@ -199,10 +199,6 @@ void cleanUp() { SDL_Quit(); }
 
 int main(int argc, char *argv[])
 {
-
-
-
-	SDL_Window *displayWindow = NULL;
 	SDL_Event event;
 	setup();
 
@@ -217,7 +213,7 @@ int main(int argc, char *argv[])
 	Entity *ball = new Entity(0.0, 0.0, 0.1, 0.1, 6.0, "ball.png");
 
 	// initialize gameplay variables
-	bool firstwon;
+	float firstwon;
 	const Uint8 *keys = SDL_GetKeyboardState(NULL);
 
 	// nudge the ball to get it moving, initially
@@ -229,7 +225,7 @@ int main(int argc, char *argv[])
 		elapsed = ticks - lastFrameTicks;
 		lastFrameTicks = ticks;
 		update(first, second, ball, firstwon, elapsed);
-		render(displayWindow, first, second, ball, firstwon, elapsed);
+		render(first, second, ball, firstwon, elapsed);
 	}
 
 	cleanUp();
