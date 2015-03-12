@@ -1,4 +1,4 @@
-#pragma once
+
 
 #include "GameClass.h"
 
@@ -42,7 +42,7 @@ void GameClass::Render() {
 	// render stuff
 	player->Render();
 	block->Render();
-	DrawText(textImg, "Hello World", 0.2f, -0.1f, -0.9f, 0.5f, 1.0, 1.0, 1.0, 1.0);
+	//DrawText(textImg, "Hello World", 0.2f, -0.1f, -0.9f, 0.5f, 1.0, 1.0, 1.0, 1.0);
 	//DrawRectangle(0.0f, -0.2f, 0.2f, 0.2f);
 
 	SDL_GL_SwapWindow(displayWindow);
@@ -92,5 +92,5 @@ void GameClass::FixedUpdate(){
 	//counter++;
 
 	player->movement();
-	player->FixedUpdate(*block);
+	player->FixedUpdate(block);
 }

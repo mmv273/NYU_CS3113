@@ -8,8 +8,8 @@ public:
 	Entity(float x, float y, float width, float height);
 	Entity();
 	void Render();
-	bool collidesWith(const Entity &entity2);
-	void FixedUpdate(Entity &block);
+	bool collidesWith(Entity* entity2);
+	void FixedUpdate(Entity* block);
 	float lerp(float v0, float v1, float t);
 	void movement();
 	//SheetSprite sprite;

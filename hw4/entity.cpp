@@ -29,17 +29,17 @@ void Entity::Render(){
 	DrawRectangle(x, y, width, height);
 }
 
-bool Entity::collidesWith(const Entity &entity2){
-	if (y - height *0.5 > entity2.y + entity2.height *0.5){
+bool Entity::collidesWith(Entity* entity2){
+	if (y - height *0.5 > entity2->y + entity2->height *0.5){
 		return false;
 	}
-	if (y + height *0.5 < entity2.y - entity2.height *0.5){
+	if (y + height *0.5 < entity2->y - entity2->height *0.5){
 		return false;
 	}
-	if (x + width *0.5 < entity2.x - entity2.width *0.5){
+	if (x + width *0.5 < entity2->x - entity2->width *0.5){
 		return false;
 	}
-	if (x - width *0.5 > entity2.x + entity2.width *0.5){
+	if (x - width *0.5 > entity2->x + entity2->width *0.5){
 		return false;
 	}
 	return true;
@@ -57,7 +57,7 @@ void Entity::jump(){
 	}
 
 }
-void Entity::FixedUpdate(Entity &block){
+void Entity::FixedUpdate(Entity* block){
 
 	velocity_y = lerp(velocity_y, 0.0, friction_y * FIXED_TIMESTEP);
 	velocity_y += acceleration_y * FIXED_TIMESTEP;
@@ -65,8 +65,8 @@ void Entity::FixedUpdate(Entity &block){
 	y += velocity_y*FIXED_TIMESTEP;
 
 	if (collidesWith(block)){
-		float yPen = fabs(fabs(y - block.y) - height* 0.5 - block.height);
-		if (y > block.y){
+		float yPen = fabs(fabs(y - block->y) - height* 0.5 - block->height);
+		if (y > block->y){
 			y += yPen + 0.0001;
 		}
 		else {
@@ -80,8 +80,8 @@ void Entity::FixedUpdate(Entity &block){
 
 
 	if (collidesWith(block)){
-		float xPen = fabs(fabs(x - block.x) - width* 0.5 - block.width);
-		if (x > block.x){
+		float xPen = fabs(fabs(x - block->x) - width* 0.5 - block->width);
+		if (x > block->x){
 			x += xPen + 0.0001;
 		}
 		else {
