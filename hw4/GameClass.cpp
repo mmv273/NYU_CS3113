@@ -28,21 +28,22 @@ void GameClass::Init() {
 	glOrtho(-1.33, 1.33, -1.0, 1.0, -1.0, 1.0);
 	glMatrixMode(GL_MODELVIEW);
 
-	//other stuff
-	//textImg = LoadTexture("font1.png");
-	player = new Entity(0.0f, 0.1f, 0.06f, 0.06f);
-	coin = new Entity(-0.8f, -0.3f, 0.25f, 0.1f);
-    stat.push_back(new Entity(0.0f, 0.0f, 0.25f, 0.1f));
-	stat.push_back(new Entity(-0.8f, -0.3f, 0.25f, 0.1f));
-	stat.push_back(new Entity(0.8f, -0.3f, 0.25f, 0.1f));
-	stat.push_back(new Entity(-0.8f, 0.3f, 0.25f, 0.1f));
-	stat.push_back(new Entity(0.8f, 0.3f, 0.25f, 0.1f));
-	stat.push_back(new Entity(0.0f, -0.7f, 0.25f, 0.1f));
-	stat.push_back(new Entity(0.0f, 0.7f, 0.25f, 0.1f));
-	stat.push_back(new Entity(1.0f, 1.0f, 3.0f, 0.002f)); //top border
-	stat.push_back(new Entity(-1.33f, -1.0f, .002f, 3.0f));// left border
-	stat.push_back(new Entity(1.33f, 1.0f, .002f, 3.0f)); //right border
-
+	GLuint mario = LoadTexture("mario.png");
+	GLuint block = LoadTexture("block.png");
+	GLuint coin1 = LoadTexture("coin.png");
+	player = new Entity(0.0f, 0.1f, 0.06f, 0.06f, mario);
+	coin = new Entity(.8f, .8f, 0.06f, 0.06f,coin1);
+    stat.push_back(new Entity(0.0f, 0.0f, 0.25f, 0.1f, block));
+	stat.push_back(new Entity(-0.8f, -0.3f, 0.25f, 0.1f, block));
+	stat.push_back(new Entity(0.8f, -0.3f, 0.25f, 0.1f, block));
+	stat.push_back(new Entity(-0.8f, 0.3f, 0.25f, 0.1f, block));
+	stat.push_back(new Entity(0.8f, 0.3f, 0.25f, 0.1f, block));
+	stat.push_back(new Entity(0.0f, -0.7f, 0.25f, 0.1f, block));
+	stat.push_back(new Entity(0.0f, 0.7f, 0.25f, 0.1f, block));
+	stat.push_back(new Entity(1.0f, 1.0f, 3.0f, 0.002f,block)); //top border
+	stat.push_back(new Entity(-1.33f, -1.0f, .002f, 3.0f, block));// left border
+	stat.push_back(new Entity(1.33f, 1.0f, .002f, 3.0f, block)); //right border
+	stat.push_back(new Entity(-1.0f, -1.0f, 3.0f, 0.002f, block));
 }
 GameClass::~GameClass() {
 	delete player;
@@ -55,7 +56,7 @@ void GameClass::Render() {
 	// render stuff
 	switch (state) {
 	case STATE_MAIN_MENU:
-		DrawText(fontTexture, "Welcome to The Platformer", -0.7f, 0.0f, 0.06f, 0.05f, 1.0f, 1.0f, 1.0f, 1.0f);
+		DrawText(fontTexture, "Welcome to The Platformer", -1.1f, 0.25f, 0.09f, 0.005f, 1.0f, 1.0f, 1.0f, 1.0f);
 		break;
 	case STATE_GAME_LEVEL:
 		player->Render();
@@ -64,13 +65,9 @@ void GameClass::Render() {
 			stat[i]->Render();
 		}
 		break;
-	case STATE_GAME_OVER:
-		DrawText(fontTexture, "GAME LOST Good Try", -0.8f, 0.4f, 0.2f, 0.0125f, 1.0f, 1.0f, 1.0f, 1.0f);
-		DrawText(fontTexture, "Press esc to quit.", -0.8f, -0.4f, 0.1f, 0.0125f, 1.0f, 1.0f, 1.0f, 1.0f);
-		break;
 	case STATE_WINNER:
-		DrawText(fontTexture, "WINNER WINNER", -0.8f, 0.4f, 0.2f, 0.0125f, 1.0f, 1.0f, 1.0f, 1.0f);
-		DrawText(fontTexture, "Press esc to quit.", -0.8f, -0.4f, 0.1f, 0.0125f, 1.0f, 1.0f, 1.0f, 1.0f);
+		DrawText(fontTexture, "WINNER WINNER", -0.9f, 0.3f, 0.09f, 0.005f, 1.0f, 1.0f, 1.0f, 1.0f);
+		DrawText(fontTexture, "Press esc to quit.", -0.8f, -0.4f, 0.1f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f);
 		break;
 	}
 	SDL_GL_SwapWindow(displayWindow);
@@ -103,9 +100,10 @@ bool GameClass::UpdateAndRender() {
 		FixedUpdate();
 		Update(elapsed);
 		Render();
+		
 	}
 	timeLeftOver = fixedElapsed;
-	Update(elapsed);
+	
 
 	const Uint8 *keys = SDL_GetKeyboardState(NULL);
 	
@@ -123,21 +121,13 @@ bool GameClass::UpdateAndRender() {
 		if (player->collidesWith(coin)){
 			state = STATE_WINNER;
 		}
-		else if (player->playerDead()){
-			state = STATE_GAME_OVER;
-
-		}
 	}
 	else if (state == STATE_WINNER){
 		if (keys[SDL_SCANCODE_ESCAPE]){
 			done = true;
 		}
 	}
-	else if (state == STATE_GAME_OVER){
-		if (keys[SDL_SCANCODE_ESCAPE]){
-			done = true;
-		}
-	}
+	
 	return done;
 
 }

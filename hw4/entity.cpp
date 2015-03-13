@@ -1,16 +1,10 @@
 #pragma once
 #include "entity.h"
 
-Entity::Entity(float x, float y, float width, float height)
+Entity::Entity(float x, float y, float width, float height, GLuint texture)
 	:x(x), y(y), width(width), height(height) {
 	collidedBottom = false;
-	//texture= LoadTexture(image_path);
-
-
-	//if (isStatic){
-
-	//}
-	//else {
+	
 	velocity_x = 0.20f;
 	velocity_y = 0.9f;
 	acceleration_x = 0.0f;
@@ -18,15 +12,15 @@ Entity::Entity(float x, float y, float width, float height)
 	gravity = -.900f;
 	friction_x = 0.59f;
 	friction_y = 0.20f;
-	scale = .0001f;
-	//}
+	scale = 1.0f;
+	
 }
 Entity::Entity(){};
 
 void Entity::Render(){
 
-	//DrawSprite(texture, x, y, width, height, scale);
-	DrawRectangle(x, y, width, height);
+	DrawSprite(texture, x, y, width, height, scale);
+	//DrawRectangle(x, y, width, height);
 }
 
 bool Entity::collidesWith(Entity *entity){
@@ -52,12 +46,6 @@ void Entity::jump(){
 
 }
 void Entity::FixedUpdate(vector <Entity*> stat, Entity* coin){
-
-	//if (collidesWith(coin)){
-		
-
-	//}
-	
 
 	velocity_y = lerp(velocity_y, 0.0, friction_y * FIXED_TIMESTEP);
 	velocity_y += acceleration_y * FIXED_TIMESTEP;
@@ -92,10 +80,6 @@ void Entity::FixedUpdate(vector <Entity*> stat, Entity* coin){
 				}
 			}
 		}
-}
-bool Entity::playerDead(){
-	if (y > -1.0){ return true; }
-
 }
 
 void Entity::movement(){

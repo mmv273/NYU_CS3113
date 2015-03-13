@@ -5,7 +5,7 @@
 #define MAX_TIMESTEPS 6
 class Entity {
 public:
-	Entity(float x, float y, float width, float height);
+	Entity(float x, float y, float width, float height, GLuint texture);
 	Entity();
 	void Render();
 	bool collidesWith(Entity* entity2);
