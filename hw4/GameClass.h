@@ -10,7 +10,7 @@
 #include "common.h"
 #include "entity.h"
 using namespace std;
-
+enum GameState { STATE_MAIN_MENU, STATE_GAME_LEVEL, STATE_GAME_OVER, STATE_WINNER };
 class GameClass {
 public:
 	GameClass();
@@ -21,11 +21,13 @@ public:
 	void Update(float elapsed);
 	void FixedUpdate();
 	Entity* player;
-	Entity* block;
+	Entity* coin;
+	vector <Entity*> stat;
 	bool done;
 	float lastFrameTicks;
 	float timeLeftOver;
 	SDL_Window* displayWindow;
 	SDL_Event event;
 	GLuint textImg;
+	int state;
 };

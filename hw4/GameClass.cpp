@@ -9,6 +9,7 @@
 GameClass::GameClass() {
 	Init();
 	done = false;
+	state = STATE_MAIN_MENU;
 	lastFrameTicks = 0.0f;
 	timeLeftOver = 0.0f;
 
@@ -30,7 +31,17 @@ void GameClass::Init() {
 	//other stuff
 	//textImg = LoadTexture("font1.png");
 	player = new Entity(0.0f, 0.1f, 0.06f, 0.06f);
-    block = new Entity(0.0f, -0.2f, 0.2f, 0.2f);
+    stat.push_back(new Entity(0.0f, 0.0f, 0.25f, 0.1f));
+	stat.push_back(new Entity(-0.8f, -0.3f, 0.25f, 0.1f));
+	stat.push_back(new Entity(0.8f, -0.3f, 0.25f, 0.1f));
+	stat.push_back(new Entity(-0.8f, 0.3f, 0.25f, 0.1f));
+	stat.push_back(new Entity(0.8f, 0.3f, 0.25f, 0.1f));
+	stat.push_back(new Entity(0.0f, -0.7f, 0.25f, 0.1f));
+	stat.push_back(new Entity(0.0f, 0.7f, 0.25f, 0.1f));
+	stat.push_back(new Entity(1.0f, 1.0f, 3.0f, 0.002f)); //top border
+	stat.push_back(new Entity(-1.33f, -1.0f, .002f, 3.0f));// left border
+	stat.push_back(new Entity(1.33f, 1.0f, .002f, 3.0f)); //right border
+
 }
 GameClass::~GameClass() {
 	delete player;
@@ -41,10 +52,10 @@ void GameClass::Render() {
 	glClear(GL_COLOR_BUFFER_BIT);
 	// render stuff
 	player->Render();
-	block->Render();
-	//DrawText(textImg, "Hello World", 0.2f, -0.1f, -0.9f, 0.5f, 1.0, 1.0, 1.0, 1.0);
-	//DrawRectangle(0.0f, -0.2f, 0.2f, 0.2f);
-
+	for (size_t i = 0; i < stat.size(); i++){
+		stat[i]->Render();
+	}
+	
 	SDL_GL_SwapWindow(displayWindow);
 
 }
@@ -77,6 +88,23 @@ bool GameClass::UpdateAndRender() {
 	timeLeftOver = fixedElapsed;
 	Update(elapsed);
 
+	const Uint8 *keys = SDL_GetKeyboardState(NULL);
+	
+	//if the state is main menu press space to start the game
+	if (state == STATE_MAIN_MENU){
+		if (keys[SDL_SCANCODE_SPACE]){
+			state = STATE_GAME_LEVEL;
+		}
+		// if you want to quit press esc
+		else if (keys[SDL_SCANCODE_ESCAPE]){
+			done = true;
+		}
+	}
+	else if (state == STATE_GAME_LEVEL){
+
+
+	}
+
 
 
 
@@ -86,11 +114,8 @@ bool GameClass::UpdateAndRender() {
 }
 
 void GameClass::FixedUpdate(){
-	//prints once per second
-	//static int counter = 0;
-	//if(!(counter % 60)) printf("a");
-	//counter++;
+	
 
 	player->movement();
-	player->FixedUpdate(block);
+	player->FixedUpdate(stat);
 }

@@ -9,7 +9,7 @@ public:
 	Entity();
 	void Render();
 	bool collidesWith(Entity* entity2);
-	void FixedUpdate(Entity* block);
+	void FixedUpdate(vector <Entity*> stat, Entity* coin);
 	float lerp(float v0, float v1, float t);
 	void movement();
 	//SheetSprite sprite;
