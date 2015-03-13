@@ -28,6 +28,7 @@ public:
 	float mass;
 	bool isStatic;
 	void jump();
+	bool playerDead();
 	bool enableCollisions;
 	float scale;
 

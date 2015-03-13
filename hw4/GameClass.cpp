@@ -31,6 +31,7 @@ void GameClass::Init() {
 	//other stuff
 	//textImg = LoadTexture("font1.png");
 	player = new Entity(0.0f, 0.1f, 0.06f, 0.06f);
+	coin = new Entity(-0.8f, -0.3f, 0.25f, 0.1f);
     stat.push_back(new Entity(0.0f, 0.0f, 0.25f, 0.1f));
 	stat.push_back(new Entity(-0.8f, -0.3f, 0.25f, 0.1f));
 	stat.push_back(new Entity(0.8f, -0.3f, 0.25f, 0.1f));
@@ -50,12 +51,28 @@ GameClass::~GameClass() {
 void GameClass::Render() {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
+	GLuint fontTexture = LoadTexture("font1.png");
 	// render stuff
-	player->Render();
-	for (size_t i = 0; i < stat.size(); i++){
-		stat[i]->Render();
+	switch (state) {
+	case STATE_MAIN_MENU:
+		DrawText(fontTexture, "Welcome to The Platformer", -0.7f, 0.0f, 0.06f, 0.05f, 1.0f, 1.0f, 1.0f, 1.0f);
+		break;
+	case STATE_GAME_LEVEL:
+		player->Render();
+		coin->Render();
+		for (size_t i = 0; i < stat.size(); i++){
+			stat[i]->Render();
+		}
+		break;
+	case STATE_GAME_OVER:
+		DrawText(fontTexture, "GAME LOST Good Try", -0.8f, 0.4f, 0.2f, 0.0125f, 1.0f, 1.0f, 1.0f, 1.0f);
+		DrawText(fontTexture, "Press esc to quit.", -0.8f, -0.4f, 0.1f, 0.0125f, 1.0f, 1.0f, 1.0f, 1.0f);
+		break;
+	case STATE_WINNER:
+		DrawText(fontTexture, "WINNER WINNER", -0.8f, 0.4f, 0.2f, 0.0125f, 1.0f, 1.0f, 1.0f, 1.0f);
+		DrawText(fontTexture, "Press esc to quit.", -0.8f, -0.4f, 0.1f, 0.0125f, 1.0f, 1.0f, 1.0f, 1.0f);
+		break;
 	}
-	
 	SDL_GL_SwapWindow(displayWindow);
 
 }
@@ -84,6 +101,8 @@ bool GameClass::UpdateAndRender() {
 	while (fixedElapsed >= FIXED_TIMESTEP) {
 		fixedElapsed -= FIXED_TIMESTEP;
 		FixedUpdate();
+		Update(elapsed);
+		Render();
 	}
 	timeLeftOver = fixedElapsed;
 	Update(elapsed);
@@ -100,22 +119,32 @@ bool GameClass::UpdateAndRender() {
 			done = true;
 		}
 	}
-	else if (state == STATE_GAME_LEVEL){
+	else if (state == STATE_GAME_LEVEL ){
+		if (player->collidesWith(coin)){
+			state = STATE_WINNER;
+		}
+		else if (player->playerDead()){
+			state = STATE_GAME_OVER;
 
-
+		}
 	}
-
-
-
-
-	Update(elapsed);
-	Render();
+	else if (state == STATE_WINNER){
+		if (keys[SDL_SCANCODE_ESCAPE]){
+			done = true;
+		}
+	}
+	else if (state == STATE_GAME_OVER){
+		if (keys[SDL_SCANCODE_ESCAPE]){
+			done = true;
+		}
+	}
 	return done;
+
 }
 
 void GameClass::FixedUpdate(){
 	
 
 	player->movement();
-	player->FixedUpdate(stat);
+	player->FixedUpdate(stat, coin);
 }

@@ -93,6 +93,11 @@ void Entity::FixedUpdate(vector <Entity*> stat, Entity* coin){
 			}
 		}
 }
+bool Entity::playerDead(){
+	if (y > -1.0){ return true; }
+
+}
+
 void Entity::movement(){
 	const Uint8 *keys = SDL_GetKeyboardState(NULL);
 	if (keys[SDL_SCANCODE_LEFT]) {
