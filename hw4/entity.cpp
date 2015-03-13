@@ -146,6 +146,7 @@ void Entity::FixedUpdate(vector <Entity*> stat, Entity* coin){
 			}
 			else {
 				y -= yPen + 0.0001;
+				velocity_y = 0;
 			}
 		}
 	}
@@ -159,9 +160,11 @@ void Entity::FixedUpdate(vector <Entity*> stat, Entity* coin){
 				float xPen = fabs(fabs(x - stat[j]->x) - width - stat[j]->width);
 				if (x > stat[j]->x){
 					x += xPen + 0.0001;
+					velocity_x = 0;
 				}
 				else {
 					x -= xPen + 0.0001;
+					velocity_x = 0;
 				}
 			}
 		}

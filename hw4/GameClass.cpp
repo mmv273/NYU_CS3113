@@ -7,6 +7,7 @@ GameClass::GameClass() {
 	state = STATE_MAIN_MENU;
 	lastFrameTicks = 0.0f;
 	timeLeftOver = 0.0f;
+	fontTexture = LoadTexture("font1.png");
 
 }
 
@@ -69,7 +70,7 @@ void DrawText(const GLuint &fontTexture,
 }
 
 
-GLuint LoadTexture(const char *image_path) {
+GLuint GameClass::LoadTexture(const char *image_path) {
 	SDL_Surface *surface = IMG_Load(image_path);
 	GLuint textureID;
 	glGenTextures(1, &textureID);
@@ -114,7 +115,6 @@ GameClass::~GameClass() {
 void GameClass::Render() {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
-	GLuint fontTexture = LoadTexture("font1.png");
 	// render stuff
 	switch (state) {
 	case STATE_MAIN_MENU:

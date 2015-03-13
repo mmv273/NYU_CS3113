@@ -17,6 +17,7 @@ public:
 	bool processEvents();
 	void Render();
 	void Update(float elapsed);
+	GLuint GameClass::LoadTexture(const char *image_path);
 	void FixedUpdate();
 	Entity* player;
 	Entity* coin;
@@ -28,4 +29,5 @@ public:
 	SDL_Event event;
 	GLuint textImg;
 	int state;
+	GLuint fontTexture;
 };
