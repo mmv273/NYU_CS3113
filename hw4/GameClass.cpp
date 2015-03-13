@@ -1,11 +1,6 @@
 
-
 #include "GameClass.h"
-
-// 60 FPS (1.0f/60.0f)
-
-
-
+#include "entity.h"
 GameClass::GameClass() {
 	Init();
 	done = false;
@@ -14,36 +9,103 @@ GameClass::GameClass() {
 	timeLeftOver = 0.0f;
 
 }
+
+void DrawText(const GLuint &fontTexture,
+	const std::string &text,
+	const float &x,
+	const float &y,
+	const float &size,
+	const float &spacing,
+	const float &r,
+	const float &g,
+	const float &b,
+	const float &a) {
+	glBindTexture(GL_TEXTURE_2D, fontTexture);
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	float texture_size = 1.0 / 16.0;
+	std::vector<float> vertexData;
+	std::vector<float> texCoordData;
+	std::vector<float> colorData;
+
+	for (size_t i = 0; i < text.size(); i++) {
+		float texture_x = (float)(((int)text[i]) % 16) / 16.0f;
+		float texture_y = (float)(((int)text[i]) / 16) / 16.0f;
+		colorData.insert(colorData.end(), { r, g, b, a, r, g, b, a, r, g, b, a, r, g, b, a });
+		vertexData.insert(vertexData.end(),
+		{ ((size + spacing) * i) + (-0.5f * size),
+		0.5f * size,
+		((size + spacing) * i) + (-0.5f * size),
+		-0.5f * size,
+		((size + spacing) * i) + (0.5f * size),
+		-0.5f * size,
+		((size + spacing) * i) + (0.5f * size),
+		0.5f * size });
+		texCoordData.insert(texCoordData.end(),
+		{ texture_x,
+		texture_y,
+		texture_x,
+		texture_y + texture_size,
+		texture_x + texture_size,
+		texture_y + texture_size,
+		texture_x + texture_size,
+		texture_y });
+	}
+
+	glLoadIdentity();
+	glTranslatef(x, y, 0.0);
+
+	glColorPointer(4, GL_FLOAT, 0, colorData.data());
+	glEnableClientState(GL_COLOR_ARRAY);
+	glVertexPointer(2, GL_FLOAT, 0, vertexData.data());
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glTexCoordPointer(2, GL_FLOAT, 0, texCoordData.data());
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDrawArrays(GL_QUADS, 0, text.size() * 4);
+	glDisable(GL_TEXTURE_2D);
+	glDisableClientState(GL_COLOR_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+}
+
+
+GLuint LoadTexture(const char *image_path) {
+	SDL_Surface *surface = IMG_Load(image_path);
+	GLuint textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_RGBA,
+		GL_UNSIGNED_BYTE, surface->pixels);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	SDL_FreeSurface(surface);
+	return textureID;
+}
 void GameClass::Init() {
-	//video stuff
 	SDL_Init(SDL_INIT_VIDEO);
 	displayWindow = SDL_CreateWindow("My Game", SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL);
 	SDL_GLContext context = SDL_GL_CreateContext(displayWindow);
 	SDL_GL_MakeCurrent(displayWindow, context);
-
-
 	glViewport(0, 0, 800, 600);
 	glMatrixMode(GL_PROJECTION);
 	glOrtho(-1.33, 1.33, -1.0, 1.0, -1.0, 1.0);
 	glMatrixMode(GL_MODELVIEW);
 
-	GLuint mario = LoadTexture("mario.png");
-	GLuint block = LoadTexture("block.png");
-	GLuint coin1 = LoadTexture("coin.png");
-	player = new Entity(0.0f, 0.1f, 0.06f, 0.06f, mario);
-	coin = new Entity(.8f, .8f, 0.06f, 0.06f,coin1);
-    stat.push_back(new Entity(0.0f, 0.0f, 0.25f, 0.1f, block));
-	stat.push_back(new Entity(-0.8f, -0.3f, 0.25f, 0.1f, block));
-	stat.push_back(new Entity(0.8f, -0.3f, 0.25f, 0.1f, block));
-	stat.push_back(new Entity(-0.8f, 0.3f, 0.25f, 0.1f, block));
-	stat.push_back(new Entity(0.8f, 0.3f, 0.25f, 0.1f, block));
-	stat.push_back(new Entity(0.0f, -0.7f, 0.25f, 0.1f, block));
-	stat.push_back(new Entity(0.0f, 0.7f, 0.25f, 0.1f, block));
-	stat.push_back(new Entity(1.0f, 1.0f, 3.0f, 0.002f,block)); //top border
-	stat.push_back(new Entity(-1.33f, -1.0f, .002f, 3.0f, block));// left border
-	stat.push_back(new Entity(1.33f, 1.0f, .002f, 3.0f, block)); //right border
-	stat.push_back(new Entity(-1.0f, -1.0f, 3.0f, 0.002f, block));
+	
+	player = new Entity(0.0f, 0.1f, 0.06f, 0.06f);
+	coin = new Entity(.8f, .8f, 0.06f, 0.06f);
+    stat.push_back(new Entity(0.0f, 0.0f, 0.25f, 0.1f));
+	stat.push_back(new Entity(-0.8f, -0.3f, 0.25f, 0.1f));
+	stat.push_back(new Entity(0.8f, -0.3f, 0.25f, 0.1f));
+	stat.push_back(new Entity(-0.8f, 0.3f, 0.25f, 0.1f));
+	stat.push_back(new Entity(0.8f, 0.3f, 0.25f, 0.1f));
+	stat.push_back(new Entity(0.0f, -0.7f, 0.25f, 0.1f));
+	stat.push_back(new Entity(0.0f, 0.7f, 0.25f, 0.1f));
+	stat.push_back(new Entity(1.0f, 1.0f, 3.0f, 0.002f)); //top border
+	stat.push_back(new Entity(-1.33f, -1.0f, .002f, 3.0f));// left border
+	stat.push_back(new Entity(1.33f, 1.0f, .002f, 3.0f)); //right border
+	stat.push_back(new Entity(-1.0f, -1.0f, 3.0f, 0.002f));// bottom border
 }
 GameClass::~GameClass() {
 	delete player;
@@ -59,10 +121,10 @@ void GameClass::Render() {
 		DrawText(fontTexture, "Welcome to The Platformer", -1.1f, 0.25f, 0.09f, 0.005f, 1.0f, 1.0f, 1.0f, 1.0f);
 		break;
 	case STATE_GAME_LEVEL:
-		player->Render();
-		coin->Render();
+		player->render();
+		coin->render();
 		for (size_t i = 0; i < stat.size(); i++){
-			stat[i]->Render();
+			stat[i]->render();
 		}
 		break;
 	case STATE_WINNER:
@@ -85,7 +147,7 @@ void GameClass::Update(float elapsed) {
 		}
 	}
 }
-bool GameClass::UpdateAndRender() {
+bool GameClass::processEvents() {
 	float ticks = (float)SDL_GetTicks() / 1000.0f;
 	float elapsed = ticks - lastFrameTicks;
 	lastFrameTicks = ticks;
@@ -133,8 +195,6 @@ bool GameClass::UpdateAndRender() {
 }
 
 void GameClass::FixedUpdate(){
-	
-
 	player->movement();
 	player->FixedUpdate(stat, coin);
 }

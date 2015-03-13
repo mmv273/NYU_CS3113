@@ -72,13 +72,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="common.cpp" />
     <ClCompile Include="entity.cpp" />
     <ClCompile Include="GameClass.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="common.h" />
     <ClInclude Include="entity.h" />
     <ClInclude Include="GameClass.h" />
   </ItemGroup>

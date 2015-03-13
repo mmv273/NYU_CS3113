@@ -5,18 +5,16 @@
 #include <SDL_image.h>
 #include <iostream>
 #include <vector>
-
-
-#include "common.h"
 #include "entity.h"
 using namespace std;
-enum GameState { STATE_MAIN_MENU, STATE_GAME_LEVEL, STATE_GAME_OVER, STATE_WINNER };
+
+enum GameState { STATE_MAIN_MENU, STATE_GAME_LEVEL, STATE_WINNER };
 class GameClass {
 public:
 	GameClass();
 	~GameClass();
 	void Init();
-	bool UpdateAndRender();
+	bool processEvents();
 	void Render();
 	void Update(float elapsed);
 	void FixedUpdate();
