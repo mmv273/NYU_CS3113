@@ -12,7 +12,7 @@ Entity::Entity(float x, float y, int index, int col, int rows, float scale, GLui
 	velocity_y = 0.0f;
 	acceleration_x = 0.0f;
 	acceleration_y = 0.0f;
-	gravity = -1.900f;
+	gravity = -1.300f;
 	friction_x = 0.39f;
 	friction_y = 0.59f;
 	scale = 1.0f;

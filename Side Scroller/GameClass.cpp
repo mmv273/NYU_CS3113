@@ -211,7 +211,7 @@ bool GameClass::readEntityData(std::ifstream &stream) {
 	}
 	return true;
 }
-void GameClass::placeEntity(string type, float placeX, float placeY){	if (type == "player"){		player = new Entity(placeX, placeY, 98, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}	/*if (type == "coin"){		coin = new Entity(placeX, placeY, 49, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}*/	/*if (type == "key"){		coin = new Entity(placeX, placeY, 86, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}*/	if (type == "door"){		coin = new Entity(placeX, placeY, 7, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}}
+void GameClass::placeEntity(string type, float placeX, float placeY){	if (type == "player"){		player = new Entity(placeX, placeY, 98, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}	if (type == "coin"){		coin = new Entity(placeX, placeY, 49, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}	/*if (type == "key"){		coin = new Entity(placeX, placeY, 86, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}	if (type == "door"){		coin = new Entity(placeX, placeY, 7, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}*/}
 void GameClass::Update(float elapsed) {
 	while (SDL_PollEvent(&event)) {
 		if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
@@ -288,7 +288,7 @@ bool GameClass::processEvents() {
 		}
 	}
 	else if (state == STATE_GAME_LEVEL ){
-		if ( player->collidesWith(door)){
+		if ( player->collidesWith(coin)){
 			state = STATE_WINNER;
 		}
 	}
