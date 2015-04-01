@@ -13,12 +13,12 @@ GameClass::GameClass() {
 	fontTexture = LoadTexture("font1.png");
 	spriteSheet = LoadTexture("sprites.png");
 	readTileMap();
+	
 }
 
 void GameClass::Init() {
 	SDL_Init(SDL_INIT_VIDEO);
-	displayWindow = SDL_CreateWindow("My Game", SDL_WINDOWPOS_CENTERED,
-		SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL);
+	displayWindow = SDL_CreateWindow("My Game", SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL);
 	SDL_GLContext context = SDL_GL_CreateContext(displayWindow);
 	SDL_GL_MakeCurrent(displayWindow, context);
 	glViewport(0, 0, 800, 600);
@@ -111,7 +111,7 @@ GameClass::~GameClass() {
 }
 
 void GameClass::readTileMap(){
-	ifstream infile("mymap.txt");
+	ifstream infile("mymap3.txt");
 	string line;
 	while (getline(infile, line)) {
 		if (line == "[header]") {
@@ -155,8 +155,7 @@ bool GameClass::readHeader(std::ifstream &stream) {
 		for
 			(int i =
 			0; i < mapHeight; ++i) {
-			levelData[i] = new unsigned char
-				[mapWidth];
+			levelData[i] = new unsigned char[mapWidth];
 		}
 		return true;
 	}}bool GameClass::readLayerData(std::ifstream &stream) {
@@ -212,7 +211,7 @@ bool GameClass::readEntityData(std::ifstream &stream) {
 	}
 	return true;
 }
-void GameClass::placeEntity(string type, float placeX, float placeY){	if (type == "player"){		player = new Entity(placeX, placeY, 98, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}	if (type == "coin"){		coin = new Entity(placeX, placeY, 87, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}}
+void GameClass::placeEntity(string type, float placeX, float placeY){	if (type == "player"){		player = new Entity(placeX, placeY, 98, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}	/*if (type == "coin"){		coin = new Entity(placeX, placeY, 49, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}*/	/*if (type == "key"){		coin = new Entity(placeX, placeY, 86, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}*/	if (type == "door"){		coin = new Entity(placeX, placeY, 7, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}}
 void GameClass::Update(float elapsed) {
 	while (SDL_PollEvent(&event)) {
 		if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
@@ -229,7 +228,6 @@ void GameClass::Update(float elapsed) {
 
 
 void GameClass::Render() {
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 	// render stuff
 	switch (state) {
@@ -245,6 +243,8 @@ void GameClass::Render() {
 		break;
 	}
 	SDL_GL_SwapWindow(displayWindow);
+
+
 
 }
 bool GameClass::processEvents() {
@@ -288,7 +288,7 @@ bool GameClass::processEvents() {
 		}
 	}
 	else if (state == STATE_GAME_LEVEL ){
-		if (player->collidesWith(coin)){
+		if ( player->collidesWith(door)){
 			state = STATE_WINNER;
 		}
 	}
@@ -302,8 +302,22 @@ bool GameClass::processEvents() {
 
 }
 
+float lerp(float v0, float v1, float t) {
+	return (1.0 - t)*v0 + t*v1;
+}
+
+
 void GameClass::FixedUpdate(){
 	player->movement();
+	//player->FixedUpdate();
+	player->velocity_x += player->gravity * FIXED_TIMESTEP;
+	player->velocity_y += player->gravity * FIXED_TIMESTEP;
+	player->velocity_x = lerp(player->velocity_x, 0.0f, FIXED_TIMESTEP * player->friction_x);
+	player->velocity_y = lerp(player->velocity_y, 0.0f, FIXED_TIMESTEP * player->friction_y);
+	player->velocity_x += player->acceleration_x * FIXED_TIMESTEP;
+	player->velocity_y += player->acceleration_y * FIXED_TIMESTEP;
+	player->x += player->velocity_x * FIXED_TIMESTEP;
+	player->y += player->velocity_y * FIXED_TIMESTEP;
 
 }
 
@@ -319,7 +333,7 @@ float GameClass::mapCollisionX(float x, float y){
 		return 0.0f;
 	}
 
-	if ((levelData[gridY][gridX] == 35) || (levelData[gridY][gridX] == 2)){
+	if ((levelData[gridY][gridX] == 0) || (levelData[gridY][gridX] == 3)){
 		float xCoordinate = (gridX * TILE_SIZE); // -(TILE_SIZE * 1.0f);
 		return -x - xCoordinate;
 	}
@@ -333,7 +347,7 @@ float GameClass::mapCollisionY(float x, float y){
 		return 0.0f;
 	}
 
-	if ((levelData[gridY][gridX] == 35) || (levelData[gridY][gridX] == 2)){
+	if ((levelData[gridY][gridX] == 0) || (levelData[gridY][gridX] == 3)){
 		float yCoordinate = (gridY * TILE_SIZE); // -(TILE_SIZE * 1.0);
 		return -y - yCoordinate;
 	}
@@ -426,7 +440,6 @@ void GameClass::renderLevel(){
 	// draw the players
 	player->Draw(translateX, translateY);
 	coin->Draw(translateX, translateY);
-	glPushMatrix();
-	glPopMatrix();
+	
 
 }

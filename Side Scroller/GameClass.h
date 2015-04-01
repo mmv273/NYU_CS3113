@@ -47,6 +47,8 @@ public:
 	void FixedUpdate();
 	Entity* player;
 	Entity* coin;
+	Entity* key;
+	Entity* door;
 	vector <Entity*> stat;
 	bool done;
 	float lastFrameTicks;

@@ -1,37 +1,26 @@
-#pragma once
+
 #include "entity.h"
 
 Entity::Entity(float x, float y, int index, int col, int rows, float scale, GLuint texture)
 	:x(x), y(y), scale(scale), texture(texture) {
-	collidedBottom = false;
+	
 	u = (float)(index % col) / (float) col;
 	v = (float)(index / col) / (float) rows;
 	width = (1.0 / col);
 	height = (1.0 / rows);
-	velocity_x = 0.20f;
-	velocity_y = 0.9f;
+	velocity_x = 0.0f;
+	velocity_y = 0.0f;
 	acceleration_x = 0.0f;
 	acceleration_y = 0.0f;
-	gravity = -.900f;
-	friction_x = 0.59f;
-	friction_y = 0.20f;
+	gravity = -1.900f;
+	friction_x = 0.39f;
+	friction_y = 0.59f;
 	scale = 1.0f;
 	
 }
 Entity::Entity(){};
 
-GLuint Entity::LoadTexture(const char *image_path) {
-	SDL_Surface *surface = IMG_Load(image_path);
-	GLuint textureID;
-	glGenTextures(1, &textureID);
-	glBindTexture(GL_TEXTURE_2D, textureID);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_RGBA,
-		GL_UNSIGNED_BYTE, surface->pixels);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	SDL_FreeSurface(surface);
-	return textureID;
-}
+
 
 void Entity::DrawRectangle(float x, float y, float r1, float r2){
 	GLfloat quad[] = { (x - r1), (y + r2),
@@ -161,63 +150,36 @@ float Entity::lerp(float v0, float v1, float t){
 
 void Entity::jump(){
 	if (collidedBottom){
-		velocity_y = 1.0f;
+		velocity_y = .80f;
+		y += .001;
 		collidedBottom = false;
 	}
 
 }
-//void Entity::FixedUpdate(vector <Entity*> stat, Entity* coin){
-//
-//	velocity_y = lerp(velocity_y, 0.0, friction_y * FIXED_TIMESTEP);
-//	velocity_y += acceleration_y * FIXED_TIMESTEP;
-//	velocity_y += gravity * FIXED_TIMESTEP;
-//	y += velocity_y*FIXED_TIMESTEP;
-//	for (size_t i = 0; i < stat.size(); i++){
-//		if (collidesWith(stat[i])){
-//			float yPen = fabs(fabs(y - stat[i]->y) - height - stat[i]->height);
-//			if (y > stat[i]->y){
-//				y += yPen + 0.0001;
-//				velocity_y = 0;
-//				collidedBottom = true;
-//			}
-//			else {
-//				y -= yPen + 0.0001;
-//				velocity_y = 0;
-//			}
-//		}
-//	}
-//		velocity_x = lerp(velocity_x, 0.0, friction_x * FIXED_TIMESTEP);
-//		velocity_x += acceleration_x * FIXED_TIMESTEP;
-//		x += velocity_x * FIXED_TIMESTEP;
-//		for (size_t j = 0; j < stat.size(); j++){
-//
-//
-//			if (collidesWith(stat[j])){
-//				float xPen = fabs(fabs(x - stat[j]->x) - width - stat[j]->width);
-//				if (x > stat[j]->x){
-//					x += xPen + 0.0001;
-//					velocity_x = 0;
-//				}
-//				else {
-//					x -= xPen + 0.0001;
-//					velocity_x = 0;
-//				}
-//			}
-//		}
-//}
+void Entity::FixedUpdate(){
+
+	velocity_y = lerp(velocity_y, 0.0, friction_y * FIXED_TIMESTEP);
+	velocity_y += acceleration_y * FIXED_TIMESTEP;
+	velocity_y += gravity * FIXED_TIMESTEP;
+	y += velocity_y*FIXED_TIMESTEP;
+	velocity_x = lerp(velocity_x, 0.0, friction_x * FIXED_TIMESTEP);
+	velocity_x += acceleration_x * FIXED_TIMESTEP;
+	x += velocity_x * FIXED_TIMESTEP;
+}
 
 void Entity::movement(){
 	const Uint8 *keys = SDL_GetKeyboardState(NULL);
 	if (keys[SDL_SCANCODE_LEFT]) {
-		acceleration_x = -2.0;
+		acceleration_x = -3.0;
 	}
 	else if (keys[SDL_SCANCODE_RIGHT]) {
 
-		acceleration_x = 2.0;
+		acceleration_x = 3.0;
 	}
 	
 	else {
 		acceleration_x = 0;
+		velocity_x = 0.10;
 	}
 	
 }

@@ -12,7 +12,7 @@ using namespace std;
 
 class Entity {
 public:
-	Entity::Entity(float x, float y, int index, int col, int rows, float scale, GLuint texture);
+	Entity(float x, float y, int index, int col, int rows, float scale, GLuint texture);
 	Entity();
 	GLuint LoadTexture(const char *image_path);
 	void DrawText(const GLuint &fontTexture, const std::string &text, const float &x, const float &y, const float &size, const float &spacing, const float &r, const float &g, const float &b, const float &a);
@@ -20,7 +20,7 @@ public:
 	void Draw(const float &translateX, const float &translateY);
 	void render();
 	bool collidesWith(Entity* entity2);
-	//void FixedUpdate(vector <Entity*> stat, Entity* coin);
+	void FixedUpdate();
 	float lerp(float v0, float v1, float t);
 	void movement();
 	float x;
