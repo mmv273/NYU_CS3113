@@ -10,6 +10,7 @@
 #include <iostream>
 #include <sstream>
 #include "entity.h"
+#include <SDL_mixer.h>
 using namespace std;
 
 enum GameState { STATE_MAIN_MENU, STATE_GAME_LEVEL, STATE_WINNER };
@@ -43,12 +44,18 @@ public:
 	void entityCollisionX(Entity* entity);
 	void entityCollisionY(Entity* entity);
 	void placeEntity(string type, float placeX, float placeY);
+	bool winner();
 	void renderLevel();
 	void FixedUpdate();
 	Entity* player;
 	Entity* coin;
 	Entity* key;
 	Entity* door;
+	Mix_Music *music;
+	Mix_Chunk *someSound;
+	bool hit1;
+	bool hit2;
+	bool hit3;
 	vector <Entity*> stat;
 	bool done;
 	float lastFrameTicks;

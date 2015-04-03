@@ -1,6 +1,8 @@
-
+//Mani Vivek
+//Collect the three items and you win :D
 #include "GameClass.h"
 #include "entity.h"
+
 #define SHEET_SPRITE_COLUMNS 16
 #define SHEET_SPRITE_ROWS 8
 #define TILE_SIZE 0.08f
@@ -13,6 +15,11 @@ GameClass::GameClass() {
 	fontTexture = LoadTexture("font1.png");
 	spriteSheet = LoadTexture("sprites.png");
 	readTileMap();
+	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
+	music = Mix_LoadMUS("background.mp3");
+	Mix_PlayMusic(music, -1); // repeat it indefinitely
+	
+	someSound = Mix_LoadWAV("app.wav");
 	
 }
 
@@ -107,6 +114,8 @@ GLuint GameClass::LoadTexture(const char *imagePath) {
 }
 
 GameClass::~GameClass() {
+	Mix_FreeMusic(music);
+	Mix_FreeChunk(someSound);
 	SDL_Quit();
 }
 
@@ -211,7 +220,7 @@ bool GameClass::readEntityData(std::ifstream &stream) {
 	}
 	return true;
 }
-void GameClass::placeEntity(string type, float placeX, float placeY){	if (type == "player"){		player = new Entity(placeX, placeY, 98, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}	if (type == "coin"){		coin = new Entity(placeX, placeY, 49, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}	/*if (type == "key"){		coin = new Entity(placeX, placeY, 86, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}	if (type == "door"){		coin = new Entity(placeX, placeY, 7, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}*/}
+void GameClass::placeEntity(string type, float placeX, float placeY){	if (type == "player"){		player = new Entity(placeX, placeY, 98, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}	if (type == "coin"){		coin = new Entity(placeX, placeY, 49, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}	if (type == "key"){		key = new Entity(placeX, placeY, 86, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}	if (type == "door"){		door = new Entity(placeX, placeY, 7, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}}
 void GameClass::Update(float elapsed) {
 	while (SDL_PollEvent(&event)) {
 		if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
@@ -288,7 +297,22 @@ bool GameClass::processEvents() {
 		}
 	}
 	else if (state == STATE_GAME_LEVEL ){
-		if ( player->collidesWith(coin)){
+		if (player->collidesWith(coin)){
+			coin = new Entity(coin->x, coin->y, 12, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);
+			Mix_PlayChannel(-1, someSound, 0);
+			hit1 = true;
+		}
+		if (player->collidesWith(key)){
+			key = new Entity(key->x, key->y, 12, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);
+			Mix_PlayChannel(-1, someSound, 0);
+			hit2 = true;
+		}
+		if (player->collidesWith(door)){
+			door = new Entity(door->x, door->y, 12, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);
+			Mix_PlayChannel(-1, someSound, 0);
+			hit3 = true;
+		}
+		if ((hit1 & hit2 & hit3)){
 			state = STATE_WINNER;
 		}
 	}
@@ -302,6 +326,8 @@ bool GameClass::processEvents() {
 
 }
 
+
+
 float lerp(float v0, float v1, float t) {
 	return (1.0 - t)*v0 + t*v1;
 }
@@ -309,7 +335,6 @@ float lerp(float v0, float v1, float t) {
 
 void GameClass::FixedUpdate(){
 	player->movement();
-	//player->FixedUpdate();
 	player->velocity_x += player->gravity * FIXED_TIMESTEP;
 	player->velocity_y += player->gravity * FIXED_TIMESTEP;
 	player->velocity_x = lerp(player->velocity_x, 0.0f, FIXED_TIMESTEP * player->friction_x);
@@ -359,7 +384,6 @@ void GameClass::entityCollisionX(Entity* entity){
 	float buffer = mapCollisionX(entity->x - entity->width * 0.5, entity->y);
 	if (buffer != 0.0f){
 		entity->x -= buffer * FIXED_TIMESTEP * TILE_SIZE;
-		entity->x += 0.001f;
 		entity->velocity_x = 0.0f;
 		entity->collidedLeft = true;
 	}
@@ -367,7 +391,6 @@ void GameClass::entityCollisionX(Entity* entity){
 	buffer = mapCollisionX(entity->x + entity->width*0.5, entity->y);
 	if (buffer != 0.0f){
 		entity->x += buffer * FIXED_TIMESTEP * TILE_SIZE;
-		entity->x -= 0.001f;
 		entity->velocity_x = 0.0f;
 		entity->collidedRight = true;
 	}
@@ -440,6 +463,7 @@ void GameClass::renderLevel(){
 	// draw the players
 	player->Draw(translateX, translateY);
 	coin->Draw(translateX, translateY);
-	
+	door->Draw(translateX, translateY);
+	key->Draw(translateX, translateY);
 
 }
