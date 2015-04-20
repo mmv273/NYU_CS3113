@@ -1,7 +1,7 @@
 
 #include "entity.h"
 
-Entity::Entity(float x, float y, int index, int col, float rows, float scale, float rotation, float velocityX, float velcityY, GLuint t)
+Entity::Entity(float x, float y, int index, int col, float rows, float scale, float rotation, float velocityX, float velocityY, GLuint t)
 	:x(x), y(y), scale(scale), rotation(rotation),velocityX(velocityX), velocityY(velocityY), t(t) {
 	
 	u = (float)(index % col) / (float) col;

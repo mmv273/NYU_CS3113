@@ -1,5 +1,5 @@
 //Mani Vivek
-//Collect the three items and you win :D
+
 #include "GameClass.h"
 
 #define SHEET_SPRITE_COLUMNS 16
@@ -45,10 +45,12 @@ void GameClass::Init() {
 	}
 
 void GameClass::createEntities(){
-	player = new Entity(0.0, 0.0, 177, 30, 30, 1.25, 0.0, 0.0, 0.0, spriteSheet);
-	for (int i = 0; i < 17; i++) {
-		asteroids.push_back(new Entity(randomRange(-0.5, 0.5), randomRange(-0.75, 0.75), 3507, 30, 30, 1.25 * randomRange(0.5, 1.25), randomRange(0.0, 2.25), randomRange(-1.5, 1.5), randomRange(-1.50, 1.50), spriteSheet));
+	player = new Entity(0.0, 0.0, 80, 16, 8, .75, 0.0, 0.0, 0.0, spriteSheet);
+	
+	for (int i = 0; i < 5; i++) {
+		asteroids.push_back(new Entity(randomRange(-0.5, 0.5), randomRange(-0.75, 0.75), 63, 16, 8,  randomRange(0.5, 1.0), randomRange(0.0, 2.25), randomRange(-0.25, 0.25), randomRange(-0.25, 0.25), spriteSheet));
 	}
+
 }
 
 void GameClass::DrawText(string text, float x, float y, float size, float spacing, float r, float g, float b, float a) {
@@ -211,18 +213,18 @@ void GameClass::Update(float elapsed) {
 			
 			}
 		if (keys[SDL_SCANCODE_UP]) {
-			player->x += 1.8f * player->vector.x * elapsed;
-			player->y += 1.8f * player->vector.y * elapsed;
+			player->x += 10.8f * player->vector.x * elapsed;
+			player->y += 10.8f * player->vector.y * elapsed;
 		}
 		else if (keys[SDL_SCANCODE_DOWN]) {
-			player->x -= 1.8f * player->vector.x * elapsed;
-			player->y -= 1.8f * player->vector.y * elapsed;
+			player->x -= 10.8f * player->vector.x * elapsed;
+			player->y -= 10.8f * player->vector.y * elapsed;
 		}
 		if (keys[SDL_SCANCODE_RIGHT]) {
-			player->rotation -= 10.0f * elapsed;
+			player->rotation -= 30.0f * elapsed;
 		}
 		else if (keys[SDL_SCANCODE_LEFT]) {
-			player->rotation += 10.0f * elapsed;
+			player->rotation += 30.0f * elapsed;
 		}
 		else if (keys[SDL_SCANCODE_Q]){
 			done = true;
@@ -259,7 +261,7 @@ bool GameClass::processEvents() {
 	lastFrameTicks = ticks;
 	player->generateMatrix();
 	player->setVector();
-
+	
 	float fixedElapsed = elapsed + timeLeftOver;
 	if (fixedElapsed > FIXED_TIMESTEP * MAX_TIMESTEPS) {
 		fixedElapsed = FIXED_TIMESTEP * MAX_TIMESTEPS;
@@ -282,9 +284,11 @@ bool GameClass::processEvents() {
 		}
 	}
 	else if (state == STATE_GAME_LEVEL){
-		for (size_t j = 0; j < asteroids.size(); j++) {
-			if (checkCollision(player, asteroids[j])) {
-				state = STATE_GAME_OVER;
+		if (ticks > 10.0){
+			for (size_t j = 0; j < asteroids.size(); j++) {
+				if (checkCollision(player, asteroids[j])) {
+					state = STATE_GAME_OVER;
+				}
 			}
 		}
 	}
@@ -303,12 +307,19 @@ void GameClass::FixedUpdate() {
 	player->FixedUpdate();
 	pCollision = false;
 	aCollision = false;
+	if (player->x <= -1.4f || player->x >= 1.4f) {
+		player->x = -0.99f;
+	}
+	if (player->y <= -1.0f || player->y >= 1.0f) {
+		player->y *= -0.99f;
+	}
+
 	for (size_t i = 0; i < asteroids.size(); i++) {
-		//Update asteroids position, if off-screen wrap them around
+		
 		asteroids[i]->FixedUpdate();
 
 		if (asteroids[i]->x <= -1.4f || asteroids[i]->x >= 1.4f) {
-			asteroids[i]->x = -0.99f;
+			asteroids[i]->x *= -0.99f;
 		}
 		if (asteroids[i]->y <= -1.0f || asteroids[i]->y >= 1.0f) {
 			asteroids[i]->y *= -0.99f;

@@ -13,7 +13,7 @@ using namespace std;
 
 class Entity {
 public:
-	Entity(float x,float y,int index, int col, float rows,float scale, float rotation,float velocityX, float velcityY,GLuint t);
+	Entity(float x,float y,int index, int col, float rows,float scale, float rotation,float velocityX, float velocityY,GLuint t);
 	Entity();
 	void Draw();
 	float lerp(float v0, float v1, float t);

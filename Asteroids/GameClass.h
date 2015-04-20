@@ -39,6 +39,7 @@ public:
 	bool pCollision;
 	bool aCollision;
 	float lastFrameTicks;
+	float timer;
 	float timeLeftOver;
 	SDL_Window* displayWindow;
 	SDL_Event event;
