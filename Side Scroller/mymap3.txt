@@ -47,20 +47,25 @@ data=
 [ObjectsLayer]
 # player
 type=player
-location=72,144,0,0
+location=4,9,0,0
 
 [ObjectsLayer]
 # coin
 type=coin
-location=773.33,328,0,0
+location=48,20,0,0
 
 [ObjectsLayer]
 # key
 type=key
-location=116,472,0,0
+location=7,29,0,0
 
 [ObjectsLayer]
 # door
 type=door
-location=793.33,54.67,0,0
+location=49,3,0,0
+
+[ObjectsLayer]
+# player2
+type=player2
+location=4,15,0,0
 
