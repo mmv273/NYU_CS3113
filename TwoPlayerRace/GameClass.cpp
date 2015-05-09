@@ -120,7 +120,7 @@ GameClass::~GameClass() {
 }
 
 void GameClass::readTileMap(){
-	ifstream infile("mymap3.txt");
+	ifstream infile("mymap5.txt");
 	string line;
 	while (getline(infile, line)) {
 		if (line == "[header]") {
@@ -131,7 +131,7 @@ void GameClass::readTileMap(){
 		else if (line == "[layer]") {
 			readLayerData(infile);
 		}
-		else if (line == "[ObjectsLayer]") {
+		else if (line == "[Object Layer 1]") {
 			readEntityData(infile);
 		}
 	}
@@ -220,7 +220,7 @@ bool GameClass::readEntityData(std::ifstream &stream) {
 	}
 	return true;
 }
-void GameClass::placeEntity(string type, float placeX, float placeY){	if (type == "player"){		player = new Entity(placeX, placeY, 98, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}	if (type == "player2"){		player2 = new Entity(placeX, placeY, 80, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}	if (type == "coin"){		coin = new Entity(placeX, placeY, 49, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}	if (type == "key"){		key = new Entity(placeX, placeY, 86, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}	if (type == "door"){		door = new Entity(placeX, placeY, 7, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}}
+void GameClass::placeEntity(string type, float placeX, float placeY){	if (type == "player1"){		player1 = new Entity(placeX, placeY, 98, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}	if (type == "player2"){		player2 = new Entity(placeX, placeY, 80, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}	if (type == "bomb1"){		bomb1 = new Entity(placeX, placeY, 75, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		bombs.push_back(bomb1);	}	if (type == "bomb2"){		bomb2 = new Entity(placeX, placeY, 75, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		bombs.push_back(bomb2);	}	if (type == "bomb3"){		bomb3 = new Entity(placeX, placeY, 75, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		bombs.push_back(bomb3);	}	if (type == "bomb4"){		bomb4 = new Entity(placeX, placeY, 75, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		bombs.push_back(bomb4);	}	if (type == "bomb5"){		bomb5 = new Entity(placeX, placeY, 75, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		bombs.push_back(bomb5);	}	if (type == "bomb6"){		bomb6 = new Entity(placeX, placeY, 75, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		bombs.push_back(bomb6);	}	if (type == "bomb7"){		bomb7 = new Entity(placeX, placeY, 75, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		bombs.push_back(bomb7);	}	if (type == "pink1"){		pink1 = new Entity(placeX, placeY, 28, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		pinks.push_back(pink1);	}	if (type == "pink2"){		pink2 = new Entity(placeX, placeY, 28, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		pinks.push_back(pink2);	}	if (type == "pink3"){		pink3 = new Entity(placeX, placeY, 28, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		pinks.push_back(pink3);	}	if (type == "pink4"){		pink4 = new Entity(placeX, placeY, 28, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		pinks.push_back(pink4);	}	if (type == "pink5"){		pink5 = new Entity(placeX, placeY, 28, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		pinks.push_back(pink5);	}	if (type == "pink6"){		pink6 = new Entity(placeX, placeY, 28, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		pinks.push_back(pink6);	}	if (type == "pink7"){		pink7 = new Entity(placeX, placeY, 28, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		pinks.push_back(pink7);	}	if (type == "star1"){		star1 = new Entity(placeX, placeY, 49, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		stars.push_back(star1);	}	if (type == "star2"){		star2 = new Entity(placeX, placeY, 49, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		stars.push_back(star2);	}	if (type == "star3"){		star3 = new Entity(placeX, placeY, 49, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		stars.push_back(star3);	}	if (type == "goal"){		goal = new Entity(placeX, placeY, 22, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}}
 void GameClass::Update(float elapsed) {
 	while (SDL_PollEvent(&event)) {
 		if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
@@ -228,7 +228,7 @@ void GameClass::Update(float elapsed) {
 		}
 		else if (event.type == SDL_KEYDOWN) {
 			if (event.key.keysym.scancode == SDL_SCANCODE_UP) {
-				player->jump();
+				player1->jump();
 			}
 			if (event.key.keysym.scancode == SDL_SCANCODE_W) {
 				player2->jump();
@@ -279,20 +279,21 @@ bool GameClass::processEvents() {
 	while (fixedElapsed >= FIXED_TIMESTEP) {
 		fixedElapsed -= FIXED_TIMESTEP;
 		
-		player->collidedTop = false;
-		player->collidedBottom = false;
-		player->collidedLeft = false;
-		player->collidedRight = false;
-		entityCollisionY(player);
-		entityCollisionX(player);
+		player1->collidedTop = false;
+		player1->collidedBottom = false;
+		player1->collidedLeft = false;
+		player1->collidedRight = false;
+		
 		player2->collidedTop = false;
 		player2->collidedBottom = false;
 		player2->collidedLeft = false;
 		player2->collidedRight = false;
+		FixedUpdate();
+		entityCollisionY(player1);
+		entityCollisionX(player1);
 		entityCollisionY(player2);
 		entityCollisionX(player2);
 		Render();
-		FixedUpdate();
 		
 		Update(elapsed);
 		
@@ -314,29 +315,19 @@ bool GameClass::processEvents() {
 		}
 	}
 	else if (state == STATE_GAME_LEVEL ){
-		if (player->collidesWith(coin)){
-			coin = new Entity(coin->x, coin->y, 12, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);
+		
+		if (player1->collidesWith(goal)){
+			goal = new Entity(goal->x, goal->y, 12, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);
 			//Mix_PlayChannel(-1, someSound, 0);
 			hit1 = true;
-		}
-		if (player2->collidesWith(coin)){
-			coin = new Entity(coin->x, coin->y, 12, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);
+ 		}
+		if (player2->collidesWith(goal)){
+			goal = new Entity(goal->x, goal->y, 12, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);
+			//coin = new Entity(coin->x, coin->y, 12, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);
 			//Mix_PlayChannel(-1, someSound, 0);
 			hit2 = true;
 		}
-		/*if (player->collidesWith(key)){
-			key = new Entity(key->x, key->y, 12, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);
-			Mix_PlayChannel(-1, someSound, 0);
-			hit2 = true;
-		}
-		if (player->collidesWith(door)){
-			door = new Entity(door->x, door->y, 12, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);
-			Mix_PlayChannel(-1, someSound, 0);
-			hit3 = true;
-		}*/
-		/*if ((hit1 & hit2 & hit3)){
-			state = STATE_WINNER;
-		}*/
+		
 		if (hit1){
 			state = STATE_PLAYER1;
 		}
@@ -366,7 +357,7 @@ float lerp(float v0, float v1, float t) {
 
 
 void GameClass::FixedUpdate(){
-	player->movement();
+	player1->movement();
 	/*player->velocity_x += player->gravity * FIXED_TIMESTEP;
 	player->velocity_y += player->gravity * FIXED_TIMESTEP;
 	player->velocity_x = lerp(player->velocity_x, 0.0f, FIXED_TIMESTEP * player->friction_x);
@@ -384,7 +375,7 @@ void GameClass::FixedUpdate(){
 	player2->velocity_y += player2->acceleration_y * FIXED_TIMESTEP;
 	player2->x += player2->velocity_x * FIXED_TIMESTEP;
 	player2->y += player2->velocity_y * FIXED_TIMESTEP;*/
-	player->FixedUpdate();
+	player1->FixedUpdate();
 	player2->FixedUpdate();
 }
 
@@ -400,7 +391,7 @@ float GameClass::mapCollisionX(float x, float y){
 		return 0.0f;
 	}
 
-	if ((levelData[gridY][gridX] == 0) || (levelData[gridY][gridX] == 3)){
+	if ((levelData[gridY][gridX] == 3)){
 		float xCoordinate = (gridX * TILE_SIZE); // -(TILE_SIZE * 1.0f);
 		return -x - xCoordinate;
 	}
@@ -414,7 +405,7 @@ float GameClass::mapCollisionY(float x, float y){
 		return 0.0f;
 	}
 
-	if ((levelData[gridY][gridX] == 0) || (levelData[gridY][gridX] == 3)){
+	if ((levelData[gridY][gridX] == 3)){
 		float yCoordinate = (gridY * TILE_SIZE); // -(TILE_SIZE * 1.0);
 		return -y - yCoordinate;
 	}
@@ -496,15 +487,16 @@ void GameClass::RenderTiles() {
 void GameClass::renderLevel(){
 
 	glLoadIdentity();
-	if (player->x > player2->x){
-		translateX = (-player->x);
+	if (player1->x > player2->x){
+		translateX = (-player1->x);
 		
 	}
-	else if (player->x < player2->x){
+	else if (player1->x < player2->x){
 		translateX = (-player2->x);
 		
 	}
-	translateY = (-player->y + -player2->y) / 2;
+	//translateY = (-player1->y + -player2->y) / 2;
+	translateY = 0.75;
 	if (translateX > -1.33f) translateX = -1.33f;
 	else if (translateX < -mapWidth*TILE_SIZE + 1.33) translateX = -mapWidth*TILE_SIZE + 1.33;
 	/*if (translateY < 1.0f) translateY = 1.0f;
@@ -515,10 +507,19 @@ void GameClass::renderLevel(){
 	RenderTiles();
 
 	// draw the players
-	player->Draw(translateX, translateY);
-	coin->Draw(translateX, translateY);
+	player1->Draw(translateX, translateY);
+	//coin->Draw(translateX, translateY);
 	/*door->Draw(translateX, translateY);
 	key->Draw(translateX, translateY);*/
 	player2->Draw(translateX, translateY);
-
+	goal->Draw(translateX, translateY);
+	for (int i = 0; i < bombs.size(); i++){
+		bombs[i]->Draw(translateX,translateY);
+	}
+	for (int j = 0; j < stars.size(); j++){
+		stars[j]->Draw(translateX, translateY);
+	}
+	for (int k = 0; k < pinks.size(); k++){
+		pinks[k]->Draw(translateX, translateY);
+	}
 }
