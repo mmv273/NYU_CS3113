@@ -235,17 +235,6 @@ void GameClass::Update(float elapsed) {
 			}
 		}
 	}
-	if (state == STATE_TRANS) {
-		if (transTime < 300) {
-			transTime++;
-			
-		}
-		else {
-			state = nextstate;
-			
-		}
-	}
-	
 }
 
 
