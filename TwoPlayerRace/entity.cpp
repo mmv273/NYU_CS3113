@@ -12,7 +12,7 @@ Entity::Entity(float x, float y, int index, int col, int rows, float scale, GLui
 	velocity_y = 0.0f;
 	acceleration_x = 0.0f;
 	acceleration_y = 0.0f;
-	gravity = -32.500f;
+	gravity = -10.000f;
 	friction_x = 0.7f;
 	friction_y = 0.7f;
 	scale = 1.0f;
@@ -134,10 +134,10 @@ void Entity::render(){
 }
 
 bool Entity::collidesWith(Entity *entity){
-	if (x + (width) > (entity->x - ((entity->width))) &&
-		(x - (width)) < (entity->x + (entity->width)) &&
-		(y + (height)) > (entity->y - (entity->height)) &&
-		(y - (height)) < (entity->y + (entity->height)))
+	if (x + (width * scale) > (entity->x - ((entity->width * entity->scale))) &&
+		(x - (width * scale)) < (entity->x + (entity->width * entity->scale)) &&
+		(y + (height* scale)) > (entity->y - (entity->height * entity-> scale)) &&
+		(y - (height * scale)) < (entity->y + (entity->height * entity->scale)))
 	{
 		return true;
 	}
@@ -150,7 +150,7 @@ float Entity::lerp(float v0, float v1, float t){
 
 void Entity::jump(){
 	if (collidedBottom){
-		velocity_y = 4.0f;
+		velocity_y = 2.5f;
 		y += .001;
 		collidedBottom = false;
 	}
@@ -171,11 +171,11 @@ void Entity::FixedUpdate(){
 void Entity::movement(){
 	const Uint8 *keys = SDL_GetKeyboardState(NULL);
 	if (keys[SDL_SCANCODE_LEFT]) {
-		acceleration_x = -5.5;
+		acceleration_x = -3.5;
 	}
 	else if (keys[SDL_SCANCODE_RIGHT]) {
 
-		acceleration_x = 5.5;
+		acceleration_x = 3.5;
 	}
 	
 	else {
@@ -188,11 +188,11 @@ void Entity::movement(){
 void Entity::movement2(){
 	const Uint8 *keys = SDL_GetKeyboardState(NULL);
 	if (keys[SDL_SCANCODE_A]) {
-		acceleration_x = -1.5;
+		acceleration_x = -3.5;
 	}
 	else if (keys[SDL_SCANCODE_D]) {
 
-		acceleration_x = 1.5;
+		acceleration_x = 3.5;
 	}
 
 	else {

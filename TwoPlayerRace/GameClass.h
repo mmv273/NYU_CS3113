@@ -13,7 +13,7 @@
 //#include <SDL_mixer.h>
 using namespace std;
 
-enum GameState { STATE_MAIN_MENU, STATE_GAME_LEVEL, STATE_PLAYER1, STATE_PLAYER2 };
+enum GameState { STATE_MAIN_MENU, STATE_GAME_LEVEL1, STATE_GAME_LEVEL2, STATE_TRANS, STATE_PLAYER1, STATE_PLAYER2 };
 class GameClass {
 public:
 	GameClass();
@@ -33,7 +33,7 @@ public:
 		const float &g,
 		const float &b,
 		const float &a);
-	void readTileMap();
+	void readTileMap(char *map);
 	bool readHeader(std::ifstream &stream);
 	bool readLayerData(std::ifstream &stream);
 	bool readEntityData(std::ifstream &stream);
@@ -67,6 +67,14 @@ public:
 	Entity* star2;
 	Entity* star3;
 	Entity* goal;
+	int pink;
+	int bomb;
+	int star;
+	int stunTime;
+	int slowTime;
+	int boostTime;
+	int levelOneWinner;
+	int levelTwoWinner;
 	//Mix_Music *music;
 	//Mix_Chunk *someSound;
 	bool hit1;
@@ -82,6 +90,8 @@ public:
 	SDL_Event event;
 	GLuint spriteSheet;
 	int state;
+	int nextstate;
+	int transTime;
 	GLuint fontTexture;
 	float translateX;
 	float translateY;

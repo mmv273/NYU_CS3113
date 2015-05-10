@@ -14,7 +14,7 @@ GameClass::GameClass() {
 	timeLeftOver = 0.0f;
 	fontTexture = LoadTexture("font1.png");
 	spriteSheet = LoadTexture("sprites.png");
-	readTileMap();
+	
 	//Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
 	//music = Mix_LoadMUS("background.mp3");
 	//Mix_PlayMusic(music, -1); // repeat it indefinitely
@@ -119,8 +119,8 @@ GameClass::~GameClass() {
 	SDL_Quit();
 }
 
-void GameClass::readTileMap(){
-	ifstream infile("mymap5.txt");
+void GameClass::readTileMap(char *map){
+	ifstream infile(map);
 	string line;
 	while (getline(infile, line)) {
 		if (line == "[header]") {
@@ -235,6 +235,17 @@ void GameClass::Update(float elapsed) {
 			}
 		}
 	}
+	if (state == STATE_TRANS) {
+		if (transTime < 300) {
+			transTime++;
+			
+		}
+		else {
+			state = nextstate;
+			
+		}
+	}
+	
 }
 
 
@@ -247,9 +258,16 @@ void GameClass::Render() {
 	case STATE_MAIN_MENU:
 		DrawText(fontTexture, "Welcome to The Platformer", -1.1f, 0.25f, 0.09f, 0.005f, 1.0f, 1.0f, 1.0f, 1.0f);
 		break;
-	case STATE_GAME_LEVEL:
+	case STATE_GAME_LEVEL1:
 		renderLevel();
 		glClearColor(0, 0, 255, 0.7);
+		break;
+	case STATE_GAME_LEVEL2:
+		renderLevel();
+		glClearColor(0, 0, 255, 0.7);
+		break;
+	case STATE_TRANS:
+		DrawText(fontTexture, "Press esc to quit.", -0.8f, -0.4f, 0.1f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f);
 		break;
 	case STATE_PLAYER1:
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -277,27 +295,84 @@ bool GameClass::processEvents() {
 		fixedElapsed = FIXED_TIMESTEP * MAX_TIMESTEPS;
 	}
 	while (fixedElapsed >= FIXED_TIMESTEP) {
+	
+		if (state == STATE_GAME_LEVEL1 || state == STATE_GAME_LEVEL2) {
+			
+			if (bomb != 0) {
+				if (stunTime < 120)  {
+					stunTime++;
+				}
+				else {
+					stunTime = 0;
+					bomb = 0;
+				}
+			}
+			if (pink != 0) {
+				if (slowTime < 120)  {
+					slowTime++;
+				}
+				else {
+					slowTime = 0;
+					pink = 0;
+				}
+			}
+			if (star != 0) {
+				if (boostTime < 120)  {
+					boostTime++;
+				}
+				else {
+					boostTime = 0;
+					star = 0;
+				}
+			}
+			for (size_t i = 0; i < bombs.size(); i++) {
+				if (player1->collidesWith(bombs[i])) {
+					bomb = 1;
+					bombs.erase(bombs.begin() + i);
+				}
+				else if (player2->collidesWith(bombs[i])) {
+					bomb = 2;
+					bombs.erase(bombs.begin() + i);
+				}
+			}
+			for (size_t i = 0; i < pinks.size(); i++) {
+				if (player1->collidesWith(pinks[i])) {
+					pink = 1;
+					pinks.erase(pinks.begin() + i);
+				}
+				else if (player2->collidesWith(pinks[i])) {
+					pink = 2;
+					pinks.erase(pinks.begin() + i);
+				}
+			}
+			for (size_t i = 0; i < stars.size(); i++) {
+				if (player1->collidesWith(stars[i])) {
+					star = 1;
+					stars.erase(stars.begin() + i);
+				}
+				else if (player2->collidesWith(stars[i])) {
+					star = 2;
+					stars.erase(stars.begin() + i);
+				}
+			}
+			player1->collidedTop = false;
+			player1->collidedBottom = false;
+			player1->collidedLeft = false;
+			player1->collidedRight = false;
+			player2->collidedTop = false;
+			player2->collidedBottom = false;
+			player2->collidedLeft = false;
+			player2->collidedRight = false;
+			FixedUpdate();
+			entityCollisionY(player1);
+			entityCollisionX(player1);
+			entityCollisionY(player2);
+			entityCollisionX(player2);
+			
+		}
 		fixedElapsed -= FIXED_TIMESTEP;
-		
-		player1->collidedTop = false;
-		player1->collidedBottom = false;
-		player1->collidedLeft = false;
-		player1->collidedRight = false;
-		
-		player2->collidedTop = false;
-		player2->collidedBottom = false;
-		player2->collidedLeft = false;
-		player2->collidedRight = false;
-		FixedUpdate();
-		entityCollisionY(player1);
-		entityCollisionX(player1);
-		entityCollisionY(player2);
-		entityCollisionX(player2);
-		Render();
-		
 		Update(elapsed);
-		
-		
+		Render();
 	}
 	timeLeftOver = fixedElapsed;
 	
@@ -307,47 +382,109 @@ bool GameClass::processEvents() {
 	//if the state is main menu press space to start the game
 	if (state == STATE_MAIN_MENU){
 		if (keys[SDL_SCANCODE_SPACE]){
-			state = STATE_GAME_LEVEL;
+			transTime = 0;
+			readTileMap("mymap5.txt");
+			nextstate = STATE_GAME_LEVEL1;
+			state = STATE_TRANS;
+			
 		}
 		// if you want to quit press esc
 		else if (keys[SDL_SCANCODE_ESCAPE]){
 			done = true;
 		}
 	}
-	else if (state == STATE_GAME_LEVEL ){
+	else if (state == STATE_GAME_LEVEL1 ){
 		
 		if (player1->collidesWith(goal)){
+			
+
 			goal = new Entity(goal->x, goal->y, 12, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);
-			//Mix_PlayChannel(-1, someSound, 0);
-			hit1 = true;
+			transTime = 0;
+			stars.clear();
+			bombs.clear();
+			pinks.clear();
+			readTileMap("mymap6.txt");
+			levelOneWinner = 1;
+			nextstate = STATE_GAME_LEVEL2;
+			state == STATE_TRANS;
+
  		}
 		if (player2->collidesWith(goal)){
 			goal = new Entity(goal->x, goal->y, 12, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);
-			//coin = new Entity(coin->x, coin->y, 12, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);
-			//Mix_PlayChannel(-1, someSound, 0);
-			hit2 = true;
+			transTime = 0;
+			stars.clear();
+			bombs.clear();
+			pinks.clear();
+			readTileMap("mymap6.txt");
+			levelOneWinner = 2;
+			nextstate = STATE_GAME_LEVEL2;
+			state == STATE_TRANS;
 		}
-		
-		if (hit1){
-			state = STATE_PLAYER1;
+		if (player1->y < -1.70f) {
+			transTime = 0;
+			stars.clear();
+			bombs.clear();
+			pinks.clear();
+			readTileMap("mymap6.txt");
+			levelOneWinner = 2;
+			nextstate = STATE_GAME_LEVEL2;
+			state == STATE_TRANS;
 		}
-		if (hit2){
-			state = STATE_PLAYER2;
+		if (player2->y < -1.70f) {
+			transTime = 0;
+			stars.clear();
+			bombs.clear();
+			pinks.clear();
+			readTileMap("mymap6.txt");
+			levelOneWinner = 1;
+			nextstate = STATE_GAME_LEVEL2;
+			state == STATE_TRANS;
+		}
+
+	}
+	else if (state == STATE_GAME_LEVEL2){
+		if (player1->collidesWith(goal)){
+			goal = new Entity(goal->x, goal->y, 12, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);
+			levelTwoWinner = 1;
+			if (levelTwoWinner == 1 && levelOneWinner == 1){
+				state == STATE_PLAYER1;
+			}
+		}
+		if (player2->collidesWith(goal)){
+			goal = new Entity(goal->x, goal->y, 12, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);
+			levelTwoWinner = 2;
+			if (levelTwoWinner == 2 && levelOneWinner == 2){
+				state == STATE_PLAYER2;
+			}
 		}
 	}
-	else if (state == STATE_PLAYER1){
-		if (keys[SDL_SCANCODE_ESCAPE]){
-			done = true;
+	else if (state == STATE_TRANS) {
+		if (transTime < 300) {
+				transTime++;
+			}
+			else {
+				state = nextstate;
+
+			}
+		if (keys[SDL_SCANCODE_ESCAPE]) {
+			return false;
+			}
+
+		}
+	
+	else if (state == STATE_PLAYER1) {
+		if (keys[SDL_SCANCODE_ESCAPE]) {
+			return false;
 		}
 	}
-	else if (state == STATE_PLAYER2){
-		if (keys[SDL_SCANCODE_ESCAPE]){
-			done = true;
+	else if (state == STATE_PLAYER2) {
+		if (keys[SDL_SCANCODE_ESCAPE]) {
+			return false;
 		}
 	}
 	return done;
 
-}
+} 
 
 
 
@@ -358,25 +495,67 @@ float lerp(float v0, float v1, float t) {
 
 void GameClass::FixedUpdate(){
 	player1->movement();
-	/*player->velocity_x += player->gravity * FIXED_TIMESTEP;
-	player->velocity_y += player->gravity * FIXED_TIMESTEP;
-	player->velocity_x = lerp(player->velocity_x, 0.0f, FIXED_TIMESTEP * player->friction_x);
-	player->velocity_y = lerp(player->velocity_y, 0.0f, FIXED_TIMESTEP * player->friction_y);
-	player->velocity_x += player->acceleration_x * FIXED_TIMESTEP;
-	player->velocity_y += player->acceleration_y * FIXED_TIMESTEP;
-	player->x += player->velocity_x * FIXED_TIMESTEP;
-	player->y += player->velocity_y * FIXED_TIMESTEP;*/
 	player2->movement2();
-	/*player2->velocity_x += player2->gravity * FIXED_TIMESTEP;
+	if (star == 1){
+		player1->velocity_y += player1->gravity * FIXED_TIMESTEP;
+		player1->velocity_x = lerp(player1->velocity_x, 0.0f, FIXED_TIMESTEP * player1->friction_x);
+		player1->velocity_y = lerp(player1->velocity_y, 0.0f, FIXED_TIMESTEP * player1->friction_y);
+		player1->velocity_x += player1->acceleration_x * FIXED_TIMESTEP * 1.5;
+		player1->velocity_y += player1->acceleration_y * FIXED_TIMESTEP * 1.5;
+		player1->x += player1->velocity_x * FIXED_TIMESTEP;
+		player1->y += player1->velocity_y * FIXED_TIMESTEP;
+	}
+	if (pink == 1){
+		player1->velocity_y += player1->gravity * FIXED_TIMESTEP;
+		player1->velocity_x = 0;
+		player1->velocity_y = 0;
+		player1->x += player1->velocity_x * FIXED_TIMESTEP;
+		player1->y += player1->velocity_y * FIXED_TIMESTEP;
+	}
+	if (bomb == 1){
+		player1->velocity_x = 0;
+		player1->velocity_y = 0;
+		player1->acceleration_x = 0;
+		player1->acceleration_y = 0;
+	}
+	if (star == 2){
+		player2->velocity_y += player2->gravity * FIXED_TIMESTEP;
+		player2->velocity_x = lerp(player2->velocity_x, 0.0f, FIXED_TIMESTEP * player2->friction_x);
+		player2->velocity_y = lerp(player2->velocity_y, 0.0f, FIXED_TIMESTEP * player2->friction_y);
+		player2->velocity_x += player2->acceleration_x * FIXED_TIMESTEP * 1.5;
+		player2->velocity_y += player2->acceleration_y * FIXED_TIMESTEP * 1.5;
+		player2->x += player2->velocity_x * FIXED_TIMESTEP;
+		player2->y += player2->velocity_y * FIXED_TIMESTEP;
+	}
+	if (pink == 2){
+		player2->velocity_y += player2->gravity * FIXED_TIMESTEP;
+		player2->velocity_x = 0;
+		player2->velocity_y = 0;
+		player2->x += player2->velocity_x * FIXED_TIMESTEP;
+		player2->y += player2->velocity_y * FIXED_TIMESTEP;
+	}
+	if (bomb == 2){
+		player2->velocity_x = 0;
+		player2->velocity_y = 0;
+		player2->acceleration_x = 0;
+		player2->acceleration_y = 0;
+	}
+	player1->velocity_y += player1->gravity * FIXED_TIMESTEP;
+	player1->velocity_x = lerp(player1->velocity_x, 0.0f, FIXED_TIMESTEP * player1->friction_x);
+	player1->velocity_y = lerp(player1->velocity_y, 0.0f, FIXED_TIMESTEP * player1->friction_y);
+	player1->velocity_x += player1->acceleration_x * FIXED_TIMESTEP;
+	player1->velocity_y += player1->acceleration_y * FIXED_TIMESTEP;
+	player1->x += player1->velocity_x * FIXED_TIMESTEP;
+	player1->y += player1->velocity_y * FIXED_TIMESTEP;
+	
 	player2->velocity_y += player2->gravity * FIXED_TIMESTEP;
 	player2->velocity_x = lerp(player2->velocity_x, 0.0f, FIXED_TIMESTEP * player2->friction_x);
 	player2->velocity_y = lerp(player2->velocity_y, 0.0f, FIXED_TIMESTEP * player2->friction_y);
 	player2->velocity_x += player2->acceleration_x * FIXED_TIMESTEP;
 	player2->velocity_y += player2->acceleration_y * FIXED_TIMESTEP;
 	player2->x += player2->velocity_x * FIXED_TIMESTEP;
-	player2->y += player2->velocity_y * FIXED_TIMESTEP;*/
-	player1->FixedUpdate();
-	player2->FixedUpdate();
+	player2->y += player2->velocity_y * FIXED_TIMESTEP;
+	
 }
 
 void GameClass::getTileCoordinates(float tileX, float tileY, int *gridX, int *gridY) {
@@ -387,11 +566,11 @@ void GameClass::getTileCoordinates(float tileX, float tileY, int *gridX, int *gr
 float GameClass::mapCollisionX(float x, float y){
 	int gridX, gridY;
 	getTileCoordinates(x, y, &gridX, &gridY);
-	if (gridX < 0 || gridX > 64 || gridY < 0 || gridY > 32){
+	if (gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) {
 		return 0.0f;
 	}
 
-	if ((levelData[gridY][gridX] == 3)){
+	if (levelData[gridY][gridX] == 3 || levelData[gridY][gridX] == 16 || levelData[gridY][gridX] == 33 || levelData[gridY][gridX] == 96 || levelData[gridY][gridX] == 97){
 		float xCoordinate = (gridX * TILE_SIZE); // -(TILE_SIZE * 1.0f);
 		return -x - xCoordinate;
 	}
@@ -401,11 +580,11 @@ float GameClass::mapCollisionX(float x, float y){
 float GameClass::mapCollisionY(float x, float y){
 	int gridX, gridY;
 	getTileCoordinates(x, y, &gridX, &gridY);
-	if (gridX < 0 || gridX > 64 || gridY < 0 || gridY > 32){
+	if (gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight){
 		return 0.0f;
 	}
 
-	if ((levelData[gridY][gridX] == 3)){
+	if (levelData[gridY][gridX] == 3 || levelData[gridY][gridX] == 16 || levelData[gridY][gridX] == 33 || levelData[gridY][gridX] == 96 || levelData[gridY][gridX] == 97){
 		float yCoordinate = (gridY * TILE_SIZE); // -(TILE_SIZE * 1.0);
 		return -y - yCoordinate;
 	}
