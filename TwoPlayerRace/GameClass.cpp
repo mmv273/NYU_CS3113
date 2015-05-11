@@ -14,6 +14,8 @@ GameClass::GameClass() {
 	timeLeftOver = 0.0f;
 	fontTexture = LoadTexture("font1.png");
 	spriteSheet = LoadTexture("sprites.png");
+	playerOneScore = 0;
+	playerTwoScore = 0;
 	
 	//Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
 	//music = Mix_LoadMUS("background.mp3");
@@ -235,6 +237,7 @@ void GameClass::Update(float elapsed) {
 			}
 		}
 	}
+
 }
 
 
@@ -245,7 +248,7 @@ void GameClass::Render() {
 	// render stuff
 	switch (state) {
 	case STATE_MAIN_MENU:
-		DrawText(fontTexture, "Welcome to The Platformer", -1.1f, 0.25f, 0.09f, 0.005f, 1.0f, 1.0f, 1.0f, 1.0f);
+		DrawText(fontTexture, "Welcome to The Race", -1.1f, 0.25f, 0.09f, 0.005f, 1.0f, 1.0f, 1.0f, 1.0f);
 		break;
 	case STATE_GAME_LEVEL1:
 		renderLevel();
@@ -255,16 +258,22 @@ void GameClass::Render() {
 		renderLevel();
 		glClearColor(0, 0, 255, 0.7);
 		break;
-	case STATE_TRANS:
-		DrawText(fontTexture, "Press esc to quit.", -0.8f, -0.4f, 0.1f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f);
+	case STATE_GAME_LEVEL3:
+		renderLevel();
+		glClearColor(0, 0, 0, 0);
 		break;
-	case STATE_PLAYER1:
+	case STATE_GAME_OVER:
 		glClear(GL_COLOR_BUFFER_BIT);
-		DrawText(fontTexture, "PLAYER 1 HAS WON", -0.9f, 0.3f, 0.09f, 0.001f, 1.0f, 1.0f, 1.0f, 1.0f);
+		if (playerOneScore > playerTwoScore){
+			DrawText(fontTexture, "PLAYER 1 HAS WON", -0.9f, 0.3f, 0.09f, 0.001f, 1.0f, 1.0f, 1.0f, 1.0f);
+		}
+		else if (playerOneScore < playerTwoScore){
+			DrawText(fontTexture, "PLAYER 2 HAS WON", -0.9f, 0.3f, 0.09f, 0.001f, 1.0f, 1.0f, 1.0f, 1.0f);
+		}
 		DrawText(fontTexture, "Press esc to quit.", -0.8f, -0.4f, 0.1f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f);
 		break;
 	case STATE_PLAYER2:
-		DrawText(fontTexture, "PLAYER 2 HAS WON", -0.9f, 0.3f, 0.09f, 0.001f, 1.0f, 1.0f, 1.0f, 1.0f);
+		
 		DrawText(fontTexture, "Press esc to quit.", -0.8f, -0.4f, 0.1f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f);
 		break;
 	}
@@ -284,8 +293,18 @@ bool GameClass::processEvents() {
 		fixedElapsed = FIXED_TIMESTEP * MAX_TIMESTEPS;
 	}
 	while (fixedElapsed >= FIXED_TIMESTEP) {
-	
-		if (state == STATE_GAME_LEVEL1 || state == STATE_GAME_LEVEL2) {
+		if (state == STATE_GAME_LEVEL1 || state == STATE_GAME_LEVEL2|| state== STATE_GAME_LEVEL3) {
+			cout << "P1" << playerOneScore << endl;
+			if (player1->collidesWith(goal) || player2->y < -1.70f){
+				
+				playerOneScore += 1;
+				nextLevel();
+
+			}
+			if (player2->collidesWith(goal) || player1->y < -1.70f){
+				playerTwoScore += 1;
+				nextLevel();
+			}
 			
 			if (bomb != 0) {
 				if (stunTime < 120)  {
@@ -371,97 +390,30 @@ bool GameClass::processEvents() {
 	//if the state is main menu press space to start the game
 	if (state == STATE_MAIN_MENU){
 		if (keys[SDL_SCANCODE_SPACE]){
-			transTime = 0;
-			readTileMap("mymap5.txt");
-			nextstate = STATE_GAME_LEVEL1;
-			state = STATE_TRANS;
-			
-		}
+			nextLevel();
+			}
 		// if you want to quit press esc
 		else if (keys[SDL_SCANCODE_ESCAPE]){
 			done = true;
 		}
 	}
 	else if (state == STATE_GAME_LEVEL1 ){
+		if (keys[SDL_SCANCODE_ESCAPE]){
+			done = true;
+		}
 		
-		if (player1->collidesWith(goal)){
-			
-
-			goal = new Entity(goal->x, goal->y, 12, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);
-			transTime = 0;
-			stars.clear();
-			bombs.clear();
-			pinks.clear();
-			readTileMap("mymap6.txt");
-			levelOneWinner = 1;
-			nextstate = STATE_GAME_LEVEL2;
-			state == STATE_TRANS;
-
- 		}
-		if (player2->collidesWith(goal)){
-			goal = new Entity(goal->x, goal->y, 12, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);
-			transTime = 0;
-			stars.clear();
-			bombs.clear();
-			pinks.clear();
-			readTileMap("mymap6.txt");
-			levelOneWinner = 2;
-			nextstate = STATE_GAME_LEVEL2;
-			state == STATE_TRANS;
-		}
-		if (player1->y < -1.70f) {
-			transTime = 0;
-			stars.clear();
-			bombs.clear();
-			pinks.clear();
-			readTileMap("mymap6.txt");
-			levelOneWinner = 2;
-			nextstate = STATE_GAME_LEVEL2;
-			state == STATE_TRANS;
-		}
-		if (player2->y < -1.70f) {
-			transTime = 0;
-			stars.clear();
-			bombs.clear();
-			pinks.clear();
-			readTileMap("mymap6.txt");
-			levelOneWinner = 1;
-			nextstate = STATE_GAME_LEVEL2;
-			state == STATE_TRANS;
-		}
-
 	}
 	else if (state == STATE_GAME_LEVEL2){
-		if (player1->collidesWith(goal)){
-			goal = new Entity(goal->x, goal->y, 12, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);
-			levelTwoWinner = 1;
-			if (levelTwoWinner == 1 && levelOneWinner == 1){
-				state == STATE_PLAYER1;
-			}
-		}
-		if (player2->collidesWith(goal)){
-			goal = new Entity(goal->x, goal->y, 12, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);
-			levelTwoWinner = 2;
-			if (levelTwoWinner == 2 && levelOneWinner == 2){
-				state == STATE_PLAYER2;
-			}
+		if (keys[SDL_SCANCODE_ESCAPE]){
+			done = true;
 		}
 	}
-	else if (state == STATE_TRANS) {
-		if (transTime < 300) {
-				transTime++;
-			}
-			else {
-				state = nextstate;
-
-			}
-		if (keys[SDL_SCANCODE_ESCAPE]) {
-			return false;
-			}
-
+	else if (state == STATE_GAME_LEVEL3){
+		if (keys[SDL_SCANCODE_ESCAPE]){
+			done = true;
 		}
-	
-	else if (state == STATE_PLAYER1) {
+	}
+	else if (state == STATE_GAME_OVER) {
 		if (keys[SDL_SCANCODE_ESCAPE]) {
 			return false;
 		}
@@ -475,7 +427,39 @@ bool GameClass::processEvents() {
 
 } 
 
+void GameClass::nextLevel(){
+	if (state == STATE_MAIN_MENU){
+		stars.clear();
+		bombs.clear();
+		pinks.clear();
+		readTileMap("mymap5.txt");
+		state = STATE_GAME_LEVEL1;
+		
+	}
+		
+	else if (state == STATE_GAME_LEVEL1){
+		stars.clear();
+		bombs.clear();
+		pinks.clear();
+		readTileMap("mymap6.txt");
+		state = STATE_GAME_LEVEL2;
+		
+	}
+	else if (state == STATE_GAME_LEVEL2){
+		stars.clear();
+		bombs.clear();
+		pinks.clear();
+		readTileMap("mymap7.txt");
+		state = STATE_GAME_LEVEL3;
 
+	}
+	else if (state == STATE_GAME_LEVEL3){
+		
+			state = STATE_GAME_OVER;
+		
+		
+	}
+}
 
 float lerp(float v0, float v1, float t) {
 	return (1.0 - t)*v0 + t*v1;
@@ -559,7 +543,7 @@ float GameClass::mapCollisionX(float x, float y){
 		return 0.0f;
 	}
 
-	if (levelData[gridY][gridX] == 3 || levelData[gridY][gridX] == 16 || levelData[gridY][gridX] == 33 || levelData[gridY][gridX] == 96 || levelData[gridY][gridX] == 97){
+	if (levelData[gridY][gridX] == 3 || levelData[gridY][gridX] == 16 || levelData[gridY][gridX] == 33 || levelData[gridY][gridX] == 96 || levelData[gridY][gridX] == 97 || levelData[gridY][gridX] == 32 ){
 		float xCoordinate = (gridX * TILE_SIZE); // -(TILE_SIZE * 1.0f);
 		return -x - xCoordinate;
 	}
@@ -573,7 +557,7 @@ float GameClass::mapCollisionY(float x, float y){
 		return 0.0f;
 	}
 
-	if (levelData[gridY][gridX] == 3 || levelData[gridY][gridX] == 16 || levelData[gridY][gridX] == 33 || levelData[gridY][gridX] == 96 || levelData[gridY][gridX] == 97){
+	if (levelData[gridY][gridX] == 3 || levelData[gridY][gridX] == 16 || levelData[gridY][gridX] == 33 || levelData[gridY][gridX] == 96 || levelData[gridY][gridX] == 97 || levelData[gridY][gridX] == 32){
 		float yCoordinate = (gridY * TILE_SIZE); // -(TILE_SIZE * 1.0);
 		return -y - yCoordinate;
 	}
@@ -664,7 +648,8 @@ void GameClass::renderLevel(){
 		
 	}
 	//translateY = (-player1->y + -player2->y) / 2;
-	translateY = 0.75;
+	if (state == STATE_GAME_LEVEL3){ translateY = 1.00; }
+	else { translateY = 0.75; }
 	if (translateX > -1.33f) translateX = -1.33f;
 	else if (translateX < -mapWidth*TILE_SIZE + 1.33) translateX = -mapWidth*TILE_SIZE + 1.33;
 	/*if (translateY < 1.0f) translateY = 1.0f;

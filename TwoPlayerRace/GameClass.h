@@ -13,7 +13,7 @@
 //#include <SDL_mixer.h>
 using namespace std;
 
-enum GameState { STATE_MAIN_MENU, STATE_GAME_LEVEL1, STATE_GAME_LEVEL2, STATE_TRANS, STATE_PLAYER1, STATE_PLAYER2 };
+enum GameState { STATE_MAIN_MENU, STATE_GAME_LEVEL1, STATE_GAME_LEVEL2, STATE_GAME_LEVEL3, STATE_GAME_OVER, STATE_PLAYER2 };
 class GameClass {
 public:
 	GameClass();
@@ -22,6 +22,7 @@ public:
 	bool processEvents();
 	void Render();
 	void Update(float elapsed);
+	void nextLevel();
 	GLuint LoadTexture(const char *image_path);
 	void DrawText(const GLuint &fontTexture,
 		const std::string &text,
@@ -73,8 +74,9 @@ public:
 	int stunTime;
 	int slowTime;
 	int boostTime;
-	int levelOneWinner;
-	int levelTwoWinner;
+	
+	int playerOneScore;
+	int playerTwoScore;
 	//Mix_Music *music;
 	//Mix_Chunk *someSound;
 	bool hit1;
