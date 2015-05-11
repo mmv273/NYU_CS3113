@@ -16,10 +16,13 @@ GameClass::GameClass() {
 	spriteSheet = LoadTexture("sprites.png");
 	playerOneScore = 0;
 	playerTwoScore = 0;
+	timer = 0;
+	animationTime = 0.0;
+	animationValue = 0.0;
 	
-	//Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
-	//music = Mix_LoadMUS("background.mp3");
-	//Mix_PlayMusic(music, -1); // repeat it indefinitely
+	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
+	music = Mix_LoadMUS("background.mp3");
+	Mix_PlayMusic(music, -1); // repeat it indefinitely
 	
 	//someSound = Mix_LoadWAV("app.wav");
 	
@@ -116,7 +119,7 @@ GLuint GameClass::LoadTexture(const char *imagePath) {
 }
 
 GameClass::~GameClass() {
-	//Mix_FreeMusic(music);
+	Mix_FreeMusic(music);
 	//Mix_FreeChunk(someSound);
 	SDL_Quit();
 }
@@ -222,7 +225,7 @@ bool GameClass::readEntityData(std::ifstream &stream) {
 	}
 	return true;
 }
-void GameClass::placeEntity(string type, float placeX, float placeY){	if (type == "player1"){		player1 = new Entity(placeX, placeY, 98, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}	if (type == "player2"){		player2 = new Entity(placeX, placeY, 80, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}	if (type == "bomb1"){		bomb1 = new Entity(placeX, placeY, 75, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		bombs.push_back(bomb1);	}	if (type == "bomb2"){		bomb2 = new Entity(placeX, placeY, 75, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		bombs.push_back(bomb2);	}	if (type == "bomb3"){		bomb3 = new Entity(placeX, placeY, 75, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		bombs.push_back(bomb3);	}	if (type == "bomb4"){		bomb4 = new Entity(placeX, placeY, 75, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		bombs.push_back(bomb4);	}	if (type == "bomb5"){		bomb5 = new Entity(placeX, placeY, 75, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		bombs.push_back(bomb5);	}	if (type == "bomb6"){		bomb6 = new Entity(placeX, placeY, 75, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		bombs.push_back(bomb6);	}	if (type == "bomb7"){		bomb7 = new Entity(placeX, placeY, 75, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		bombs.push_back(bomb7);	}	if (type == "pink1"){		pink1 = new Entity(placeX, placeY, 28, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		pinks.push_back(pink1);	}	if (type == "pink2"){		pink2 = new Entity(placeX, placeY, 28, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		pinks.push_back(pink2);	}	if (type == "pink3"){		pink3 = new Entity(placeX, placeY, 28, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		pinks.push_back(pink3);	}	if (type == "pink4"){		pink4 = new Entity(placeX, placeY, 28, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		pinks.push_back(pink4);	}	if (type == "pink5"){		pink5 = new Entity(placeX, placeY, 28, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		pinks.push_back(pink5);	}	if (type == "pink6"){		pink6 = new Entity(placeX, placeY, 28, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		pinks.push_back(pink6);	}	if (type == "pink7"){		pink7 = new Entity(placeX, placeY, 28, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		pinks.push_back(pink7);	}	if (type == "star1"){		star1 = new Entity(placeX, placeY, 49, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		stars.push_back(star1);	}	if (type == "star2"){		star2 = new Entity(placeX, placeY, 49, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		stars.push_back(star2);	}	if (type == "star3"){		star3 = new Entity(placeX, placeY, 49, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		stars.push_back(star3);	}	if (type == "goal"){		goal = new Entity(placeX, placeY, 22, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}}
+void GameClass::placeEntity(string type, float placeX, float placeY){	if (type == "player1"){		player1 = new Entity(placeX, placeY, 98, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}	if (type == "player2"){		player2 = new Entity(placeX, placeY, 80, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}	if (type == "bomb1"){		bomb1 = new Entity(placeX, placeY, 75, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		bombs.push_back(bomb1);	}	if (type == "bomb2"){		bomb2 = new Entity(placeX, placeY, 75, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		bombs.push_back(bomb2);	}	if (type == "bomb3"){		bomb3 = new Entity(placeX, placeY, 75, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		bombs.push_back(bomb3);	}	if (type == "bomb4"){		bomb4 = new Entity(placeX, placeY, 75, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		bombs.push_back(bomb4);	}	if (type == "bomb5"){		bomb5 = new Entity(placeX, placeY, 75, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		bombs.push_back(bomb5);	}	if (type == "bomb6"){		bomb6 = new Entity(placeX, placeY, 75, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		bombs.push_back(bomb6);	}	if (type == "bomb7"){		bomb7 = new Entity(placeX, placeY, 75, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		bombs.push_back(bomb7);	}	if (type == "pink1"){		pink1 = new Entity(placeX, placeY, 28, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		pinks.push_back(pink1);	}	if (type == "pink2"){		pink2 = new Entity(placeX, placeY, 28, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		pinks.push_back(pink2);	}	if (type == "pink3"){		pink3 = new Entity(placeX, placeY, 28, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		pinks.push_back(pink3);	}	if (type == "pink4"){		pink4 = new Entity(placeX, placeY, 28, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		pinks.push_back(pink4);	}	if (type == "pink5"){		pink5 = new Entity(placeX, placeY, 28, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		pinks.push_back(pink5);	}	if (type == "pink6"){		pink6 = new Entity(placeX, placeY, 28, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		pinks.push_back(pink6);	}	if (type == "pink7"){		pink7 = new Entity(placeX, placeY, 28, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		pinks.push_back(pink7);	}	/*if (type == "star1"){		star1 = new Entity(placeX, placeY, 49, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		stars.push_back(star1);	}	if (type == "star2"){		star2 = new Entity(placeX, placeY, 49, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		stars.push_back(star2);	}	if (type == "star3"){		star3 = new Entity(placeX, placeY, 49, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);		stars.push_back(star3);	}*/	if (type == "goal"){		goal = new Entity(placeX, placeY, 22, SHEET_SPRITE_COLUMNS, SHEET_SPRITE_ROWS, 0.5, spriteSheet);	}}
 void GameClass::Update(float elapsed) {
 	while (SDL_PollEvent(&event)) {
 		if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
@@ -248,7 +251,12 @@ void GameClass::Render() {
 	// render stuff
 	switch (state) {
 	case STATE_MAIN_MENU:
-		DrawText(fontTexture, "Welcome to The Race", -1.1f, 0.25f, 0.09f, 0.005f, 1.0f, 1.0f, 1.0f, 1.0f);
+		cout << AnimationEaseIn(2.0, .25, animationValue) << endl;
+		DrawText(fontTexture, "Welcome to The Race", -1.1f, AnimationEaseIn(2.0, .25 , animationValue), 0.11f, 0.0005f, 1.0f, 1.0f, 1.0f, 1.0f);
+		DrawText(fontTexture, "There are three courses", -1.1f, 0.0f, 0.07f, 0.0005f, 1.0f, 1.0f, 1.0f, 1.0f);
+		DrawText(fontTexture, "To win get the blue orb", -1.1f, -0.25f, 0.07f, 0.0005f, 1.0f, 1.0f, 1.0f, 1.0f);
+		DrawText(fontTexture, "Bombs stun you", -1.1f, -.50f, 0.07f, 0.0005f, 1.0f, 1.0f, 1.0f, 1.0f);
+		DrawText(fontTexture, "Pink blobs slow you", -1.1f, -.75f, 0.07f, 0.0005f, 1.0f, 1.0f, 1.0f, 1.0f);
 		break;
 	case STATE_GAME_LEVEL1:
 		renderLevel();
@@ -286,22 +294,33 @@ bool GameClass::processEvents() {
 	float ticks = (float)SDL_GetTicks() / 1000.0f;
 	float elapsed = ticks - lastFrameTicks;
 	lastFrameTicks = ticks;
-
+	
 
 	float fixedElapsed = elapsed + timeLeftOver;
 	if (fixedElapsed > FIXED_TIMESTEP * MAX_TIMESTEPS) {
 		fixedElapsed = FIXED_TIMESTEP * MAX_TIMESTEPS;
 	}
 	while (fixedElapsed >= FIXED_TIMESTEP) {
-		if (state == STATE_GAME_LEVEL1 || state == STATE_GAME_LEVEL2|| state== STATE_GAME_LEVEL3) {
-			cout << "P1" << playerOneScore << endl;
-			if (player1->collidesWith(goal) || player2->y < -1.70f){
+		if (state == STATE_MAIN_MENU){
+			cout << animationTime << endl;
+			if (timer < 300){
+				timer++;
+				animationTime += elapsed;
+				animationValue = MapAnimationValue(animationTime, 0.0, 8.0, 0.0, 1.0);
+			}
+			else{
+				nextLevel();
+			}
+		}
+		else if (state == STATE_GAME_LEVEL1 || state == STATE_GAME_LEVEL2|| state== STATE_GAME_LEVEL3) {
+			
+			if (player1->collidesWith(goal) || player2->y < -1.70f|| player2->x < -.0379 || player2->x > 11.9947){
 				
 				playerOneScore += 1;
 				nextLevel();
 
 			}
-			if (player2->collidesWith(goal) || player1->y < -1.70f){
+			if (player2->collidesWith(goal) || player1->y < -1.70f || player1->x < -.0379 || player1->x > 11.9947){
 				playerTwoScore += 1;
 				nextLevel();
 			}
@@ -324,7 +343,7 @@ bool GameClass::processEvents() {
 					pink = 0;
 				}
 			}
-			if (star != 0) {
+			/*if (star != 0) {
 				if (boostTime < 120)  {
 					boostTime++;
 				}
@@ -332,7 +351,7 @@ bool GameClass::processEvents() {
 					boostTime = 0;
 					star = 0;
 				}
-			}
+			}*/
 			for (size_t i = 0; i < bombs.size(); i++) {
 				if (player1->collidesWith(bombs[i])) {
 					bomb = 1;
@@ -353,7 +372,7 @@ bool GameClass::processEvents() {
 					pinks.erase(pinks.begin() + i);
 				}
 			}
-			for (size_t i = 0; i < stars.size(); i++) {
+			/*for (size_t i = 0; i < stars.size(); i++) {
 				if (player1->collidesWith(stars[i])) {
 					star = 1;
 					stars.erase(stars.begin() + i);
@@ -362,7 +381,7 @@ bool GameClass::processEvents() {
 					star = 2;
 					stars.erase(stars.begin() + i);
 				}
-			}
+			}*/
 			player1->collidedTop = false;
 			player1->collidedBottom = false;
 			player1->collidedLeft = false;
@@ -389,11 +408,7 @@ bool GameClass::processEvents() {
 	
 	//if the state is main menu press space to start the game
 	if (state == STATE_MAIN_MENU){
-		if (keys[SDL_SCANCODE_SPACE]){
-			nextLevel();
-			}
-		// if you want to quit press esc
-		else if (keys[SDL_SCANCODE_ESCAPE]){
+		if (keys[SDL_SCANCODE_ESCAPE]){
 			done = true;
 		}
 	}
@@ -415,14 +430,14 @@ bool GameClass::processEvents() {
 	}
 	else if (state == STATE_GAME_OVER) {
 		if (keys[SDL_SCANCODE_ESCAPE]) {
-			return false;
+			done = true;
 		}
 	}
-	else if (state == STATE_PLAYER2) {
+	/*else if (state == STATE_PLAYER2) {
 		if (keys[SDL_SCANCODE_ESCAPE]) {
 			return false;
 		}
-	}
+	}*/
 	return done;
 
 } 
@@ -438,7 +453,7 @@ void GameClass::nextLevel(){
 	}
 		
 	else if (state == STATE_GAME_LEVEL1){
-		stars.clear();
+		//stars.clear();
 		bombs.clear();
 		pinks.clear();
 		readTileMap("mymap6.txt");
@@ -446,7 +461,7 @@ void GameClass::nextLevel(){
 		
 	}
 	else if (state == STATE_GAME_LEVEL2){
-		stars.clear();
+		//stars.clear();
 		bombs.clear();
 		pinks.clear();
 		readTileMap("mymap7.txt");
@@ -465,11 +480,26 @@ float lerp(float v0, float v1, float t) {
 	return (1.0 - t)*v0 + t*v1;
 }
 
+float GameClass::MapAnimationValue(float value, float sourceMin, float sourceMax, float destMin, float destMax) {
+	float returnValue = destMin + ((value - sourceMin) / (sourceMax - sourceMin) * (destMax - destMin));
+	if (returnValue < destMin) {
+		returnValue = destMin;
+	}
+	if (returnValue > destMax) {
+		returnValue = destMax;
+	}
+	return returnValue;
+}
+
+float GameClass::AnimationEaseIn(float from, float to, float time) {
+	float timeValue = time * time * time * time * time;
+	return (1.0 - timeValue) * from + timeValue * to;
+}
 
 void GameClass::FixedUpdate(){
 	player1->movement();
 	player2->movement2();
-	if (star == 1){
+	/*if (star == 1){
 		player1->velocity_y += player1->gravity * FIXED_TIMESTEP;
 		player1->velocity_x = lerp(player1->velocity_x, 0.0f, FIXED_TIMESTEP * player1->friction_x);
 		player1->velocity_y = lerp(player1->velocity_y, 0.0f, FIXED_TIMESTEP * player1->friction_y);
@@ -477,7 +507,7 @@ void GameClass::FixedUpdate(){
 		player1->velocity_y += player1->acceleration_y * FIXED_TIMESTEP * 1.5;
 		player1->x += player1->velocity_x * FIXED_TIMESTEP;
 		player1->y += player1->velocity_y * FIXED_TIMESTEP;
-	}
+	}*/
 	if (pink == 1){
 		player1->velocity_y += player1->gravity * FIXED_TIMESTEP;
 		player1->velocity_x = 0;
@@ -491,15 +521,15 @@ void GameClass::FixedUpdate(){
 		player1->acceleration_x = 0;
 		player1->acceleration_y = 0;
 	}
-	if (star == 2){
+	/*if (star == 2){
 		player2->velocity_y += player2->gravity * FIXED_TIMESTEP;
 		player2->velocity_x = lerp(player2->velocity_x, 0.0f, FIXED_TIMESTEP * player2->friction_x);
 		player2->velocity_y = lerp(player2->velocity_y, 0.0f, FIXED_TIMESTEP * player2->friction_y);
-		player2->velocity_x += player2->acceleration_x * FIXED_TIMESTEP * 1.5;
-		player2->velocity_y += player2->acceleration_y * FIXED_TIMESTEP * 1.5;
+		player2->velocity_x += player2->acceleration_x * FIXED_TIMESTEP * 1.1;
+		player2->velocity_y += player2->acceleration_y * FIXED_TIMESTEP * 1.1;
 		player2->x += player2->velocity_x * FIXED_TIMESTEP;
 		player2->y += player2->velocity_y * FIXED_TIMESTEP;
-	}
+	}*/
 	if (pink == 2){
 		player2->velocity_y += player2->gravity * FIXED_TIMESTEP;
 		player2->velocity_x = 0;
@@ -669,9 +699,9 @@ void GameClass::renderLevel(){
 	for (int i = 0; i < bombs.size(); i++){
 		bombs[i]->Draw(translateX,translateY);
 	}
-	for (int j = 0; j < stars.size(); j++){
+	/*for (int j = 0; j < stars.size(); j++){
 		stars[j]->Draw(translateX, translateY);
-	}
+	}*/
 	for (int k = 0; k < pinks.size(); k++){
 		pinks[k]->Draw(translateX, translateY);
 	}
