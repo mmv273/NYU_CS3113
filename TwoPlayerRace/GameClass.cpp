@@ -23,9 +23,9 @@ GameClass::GameClass() {
 	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
 	music = Mix_LoadMUS("background.mp3");
 	Mix_PlayMusic(music, -1); // repeat it indefinitely
-	
-	//someSound = Mix_LoadWAV("app.wav");
-	
+	slow = Mix_LoadWAV("slow.wav");
+	stun = Mix_LoadWAV("stun.wav");
+	app = Mix_LoadWAV("appl.wav");
 }
 
 void GameClass::Init() {
@@ -309,18 +309,22 @@ bool GameClass::processEvents() {
 				animationValue = MapAnimationValue(animationTime, 0.0, 8.0, 0.0, 1.0);
 			}
 			else{
+				
+				animationTime = 0.0;
+				animationValue = 0.0;
 				nextLevel();
 			}
 		}
 		else if (state == STATE_GAME_LEVEL1 || state == STATE_GAME_LEVEL2|| state== STATE_GAME_LEVEL3) {
 			
 			if (player1->collidesWith(goal) || player2->y < -1.70f|| player2->x < -.0379 || player2->x > 11.9947){
-				
+				Mix_PlayChannel(-1, app, 0);
 				playerOneScore += 1;
 				nextLevel();
 
 			}
 			if (player2->collidesWith(goal) || player1->y < -1.70f || player1->x < -.0379 || player1->x > 11.9947){
+				Mix_PlayChannel(-1, app, 0);
 				playerTwoScore += 1;
 				nextLevel();
 			}
@@ -354,20 +358,24 @@ bool GameClass::processEvents() {
 			}*/
 			for (size_t i = 0; i < bombs.size(); i++) {
 				if (player1->collidesWith(bombs[i])) {
+					Mix_PlayChannel(-1, stun, 0);
 					bomb = 1;
 					bombs.erase(bombs.begin() + i);
 				}
 				else if (player2->collidesWith(bombs[i])) {
+					Mix_PlayChannel(-1, stun, 0);
 					bomb = 2;
 					bombs.erase(bombs.begin() + i);
 				}
 			}
 			for (size_t i = 0; i < pinks.size(); i++) {
 				if (player1->collidesWith(pinks[i])) {
+					Mix_PlayChannel(-1, slow, 0);
 					pink = 1;
 					pinks.erase(pinks.begin() + i);
 				}
 				else if (player2->collidesWith(pinks[i])) {
+					Mix_PlayChannel(-1, slow, 0);
 					pink = 2;
 					pinks.erase(pinks.begin() + i);
 				}
@@ -573,7 +581,7 @@ float GameClass::mapCollisionX(float x, float y){
 		return 0.0f;
 	}
 
-	if (levelData[gridY][gridX] == 3 || levelData[gridY][gridX] == 16 || levelData[gridY][gridX] == 33 || levelData[gridY][gridX] == 96 || levelData[gridY][gridX] == 97 || levelData[gridY][gridX] == 32 ){
+	if (levelData[gridY][gridX] == 3 || levelData[gridY][gridX] == 16 || levelData[gridY][gridX] == 33 || levelData[gridY][gridX] == 32 ){
 		float xCoordinate = (gridX * TILE_SIZE); // -(TILE_SIZE * 1.0f);
 		return -x - xCoordinate;
 	}
@@ -587,7 +595,7 @@ float GameClass::mapCollisionY(float x, float y){
 		return 0.0f;
 	}
 
-	if (levelData[gridY][gridX] == 3 || levelData[gridY][gridX] == 16 || levelData[gridY][gridX] == 33 || levelData[gridY][gridX] == 96 || levelData[gridY][gridX] == 97 || levelData[gridY][gridX] == 32){
+	if (levelData[gridY][gridX] == 3 || levelData[gridY][gridX] == 16 || levelData[gridY][gridX] == 33 || levelData[gridY][gridX] == 32){
 		float yCoordinate = (gridY * TILE_SIZE); // -(TILE_SIZE * 1.0);
 		return -y - yCoordinate;
 	}

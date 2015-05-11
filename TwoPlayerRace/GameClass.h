@@ -83,7 +83,9 @@ public:
 	int playerOneScore;
 	int playerTwoScore;
 	Mix_Music *music;
-	//Mix_Chunk *someSound;
+	Mix_Chunk *slow;
+	Mix_Chunk *stun;
+	Mix_Chunk *app;
 	bool hit1;
 	bool hit2;
 	bool hit3;
